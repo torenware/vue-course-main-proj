@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
 import { useRoute} from 'vue-router';
-import { useStore } from 'vuex';
+import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {

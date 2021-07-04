@@ -35,7 +35,7 @@
 <script lang="ts">
 import { Coach } from '@/types';
 import { defineComponent, computed, ref } from 'vue';
-import { useStore } from 'vuex';
+import { useStore } from '@/store';
 
 import CoachItem from '../coaches/CoachItem.vue';
 import BaseSearch from '../UI/BaseSearch.vue';

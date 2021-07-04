@@ -4,11 +4,11 @@
   <form @submit.prevent="">
     <div class="form-control">
       <label for="title">Subject</label>
-      <input id="title" type="text" v-model="subject">
+      <input id="title" type="text" v-model.trim="subject">
     </div>
     <div class="form-control">
       <label for="message">Message</label>
-      <textarea rows="5" cols="40" placeholder="Your message here" v-model="message"></textarea>
+      <textarea rows="5" cols="40" placeholder="Your message here" v-model.trim="message"></textarea>
     </div>
     <base-button mode="outline">Send</base-button>
   </form>

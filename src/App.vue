@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useStore } from 'vuex';
+import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue'
 
 export default defineComponent({

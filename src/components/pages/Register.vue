@@ -4,13 +4,13 @@
       <h3>Register as a Coach With Us!</h3>
       <form @submit.prevent="submitInfo">
         <div class="form-control">
-          <input type="text" placeholder="First Name" >
+          <input type="text" placeholder="First Name" v-model.trim="firstName">
         </div>
         <div class="form-control">
-          <input type="text" placeholder="Last Name" >
+          <input type="text" placeholder="Last Name" v-model.trim="lastName" >
         </div>
         <div class="form-control">
-          <input type="number" placeholder="Hourly Rate (US $)" >
+          <input type="number" placeholder="Hourly Rate (US $)" v-model.number="hourlyRate">
         </div>
         <div class="form-control cgroup">
           <h4>Your Areas of Expertise</h4>
@@ -29,7 +29,7 @@
         <div class="form-control">
           <textarea
                placeholder="Short description or bio"
-               v-model="description"
+               v-model.trim="description"
                rows="5"
           />
         </div>
@@ -43,6 +43,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+// useStore has been overloaded.
+import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
@@ -53,8 +55,17 @@ export default defineComponent({
     const hourlyRate = ref(null);
     const description = ref('');
 
+    const store = useStore();
+
     const submitInfo = () => {
-      console.log('we will submit registration here.');
+      const payload = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        description: description.value,
+        hourlyRate: parseFloat(hourlyRate.value!),
+        areas: areas.value
+      };
+      store.dispatch('addCoach', payload);
     };
 
     return {
