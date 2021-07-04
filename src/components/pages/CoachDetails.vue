@@ -1,19 +1,56 @@
 <template>
-  <h2>Coach Details</h2>
-  <p>For Coach ID = {{ $route.params.id}}</p>
-  <p v-if="isTopLevelPage"><router-link :to="contactLink">Contact This Coach</router-link></p>
-  <router-view />
+  <section>
+    <base-card>
+      <h2>{{ fullName }}</h2>
+      <h3>${{ coach.hourlyRate.toFixed(2)}} / hour</h3>
+    </base-card>
+  </section>
+  <section>
+    <base-card>
+      <div class='contact' v-if="isTopLevelPage">
+        <header>
+          <h3>Get in Touch</h3>
+        </header>
+        <div  class="btn">
+          <base-button :link="true" :to="contactLink">
+            Contact This Coach
+          </base-button>
+        </div>
+      </div>
+      <router-view />
+    </base-card>
+  </section>
+  <section>
+    <base-card>
+      <base-badge v-for="area in coach.areas" :key="area" :title="area" :type="area"/>
+
+      <p>{{coach.description}}</p>
+    </base-card>
+  </section>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, onBeforeMount } from 'vue'
 import { useRoute} from 'vue-router';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   setup() {
     const route = useRoute();
     const contactLink = computed(() => {
       return `/coaches/${route.params.id}/contact`;
+    });
+
+    const coach = computed(() => {
+      const store = useStore();
+      const id = route.params.id;
+      return store.getters.coachById(id);
+    });
+
+    const fullName = computed(() => {
+      const store = useStore();
+      const id = route.params.id;
+      return store.getters.fullName(id);
     });
 
     const isTopLevelPage = computed(() => {
@@ -25,10 +62,27 @@ export default defineComponent({
       return true;
     });
 
+    onBeforeMount(() => {
+      console.log('coach', coach.value);
+    });
+
     return {
       contactLink,
-      isTopLevelPage
+      isTopLevelPage,
+      coach,
+      fullName
     };
   },
 })
 </script>
+
+<style scoped>
+  header {
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  .contact .btn {
+    text-align: end;
+  }
+</style>

@@ -6,8 +6,12 @@
 
 <script>
 export default {
-  props: ['searchTerm'],
   emits: ['search'],
+  data() {
+    return {
+      searchTerm: ''
+    }
+  },
   methods: {
     search(event) {
       this.$emit('search', event.target.value);

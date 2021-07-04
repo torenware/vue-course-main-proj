@@ -2,21 +2,24 @@
   <base-card>
     <section>
       <div class="controls">
-        <base-button mode="outline">
-          Refresh
-        </base-button>
-        <div>
-          <base-button :link="true" to="/register">
-            Become a Coach
+        <base-search  @search="doSearch" />
+        <div class='control-buttons'>
+          <base-button mode="outline">
+            Refresh
           </base-button>
+          <div>
+            <base-button :link="true" to="/register">
+              Become a Coach
+            </base-button>
+          </div>
         </div>
       </div>
     </section>
     <section>
       <ul>
         <coach-item
-          v-for="coach in coachList" 
-          :key="coach.id" 
+          v-for="coach in coachList"
+          :key="coach.id"
           :id="coach.id"
           :first-name="coach.firstName"
           :last-name="coach.lastName"
@@ -30,23 +33,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { Coach } from '@/types';
+import { defineComponent, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 
 import CoachItem from '../coaches/CoachItem.vue';
+import BaseSearch from '../UI/BaseSearch.vue';
 
 export default defineComponent({
   components: {
-    CoachItem
+    CoachItem,
+    BaseSearch
   },
   setup() {
+
+    const fullName = (coach: Coach) => {
+      return `${coach.firstName} ${coach.firstName}`;
+    };
+
+    const searchTerm = ref('');
+
+    function doSearch(term: string) {
+      searchTerm.value = term;
+    }
+
     const coachList = computed(() => {
       const store = useStore();
-      return store.getters.coaches;
+      const coaches = store.getters.coaches;
+      console.log('ST:', searchTerm.value);
+      if (searchTerm.value === '') {
+        return coaches;
+      }
+      const ucTerm = searchTerm.value.toUpperCase();
+      return  coaches.filter((coach: Coach) => {
+        return fullName(coach).toUpperCase().includes(ucTerm);
+      });
     });
 
+
     return {
-      coachList
+      coachList,
+      searchTerm,
+      doSearch
     };
   },
 })
@@ -55,6 +83,13 @@ export default defineComponent({
 <style scoped>
 div.controls {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+}
+
+div.control-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
 }
 </style>
