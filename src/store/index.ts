@@ -1,23 +1,43 @@
 import { createStore } from 'vuex';
 // @ts-ignore
-import coaches from '@/coaches';
+// import coaches from '@/coaches';
 
 import type { Coach } from '@/types';
+import fetcher from './fetcher';
 
 interface CoachList {
   coaches: Coach[];
 }
 
-type CoachOrNull = Coach | null;
+interface FetchOptions {
+  method: string;
+  // path to resource
+  res: string;
+  body?: object;
+}
 
-type CoachFunc = (id: string) => CoachOrNull;
+async function loadData(): Promise<Coach[]> {
+  try {
+    const coaches = await fetcher<Coach[]>('api/coaches', 'GET');
+    return coaches;
+  }
+  catch(err) {
+    console.log('Problem fetching', err);
+    return [];
+  }
+}
 
 // Create a new store instance.
 const store = createStore({
   state() {
     return {
-      coaches: coaches as Coach[]
+      coaches: []
     };
+  },
+  mutations: {
+    initStore(state: CoachList, coaches: Coach[]) {
+      state.coaches = coaches;
+    }
   },
   getters: {
     coaches(state: CoachList): Coach[] {
@@ -40,7 +60,14 @@ const store = createStore({
         return null;
       }
     }
+   },
+   actions: {
+     async loadStore(context) {
+       const coaches = await loadData();
+       context.commit('initStore', coaches);
+     }
    }
+
 });
 
 export default store;

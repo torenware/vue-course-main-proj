@@ -1,18 +1,23 @@
 <template>
   <the-header />
   <base-container>
-    <router-view></router-view>  
+    <router-view></router-view>
   </base-container>
 </template>
 
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import TheHeader from './components/layout/TheHeader.vue'
 
 export default defineComponent({
   components: {
     TheHeader
+  },
+  setup() {
+    const store = useStore();
+    store.dispatch('loadStore');
   }
 })
 </script>

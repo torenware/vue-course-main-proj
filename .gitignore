@@ -12,6 +12,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Datafile used by json-server
+db.json
+
 # Editor directories and files
 .idea
 .vscode
