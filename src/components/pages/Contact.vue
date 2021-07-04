@@ -12,7 +12,7 @@
     </div>
     <base-button mode="outline">Send</base-button>
   </form>
-  
+
   </base-card>
 </template>
 
@@ -64,4 +64,6 @@ export default defineComponent({
    margin: 10px 20px;
    flex: 1;
  }
+
+
 </style>

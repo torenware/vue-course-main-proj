@@ -112,7 +112,7 @@ input, textarea {
         vertical-align: bottom;
         position: relative;
         top: -1px;
-      }
+  }
 
 }
 </style>

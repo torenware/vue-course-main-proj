@@ -22,15 +22,16 @@
   </section>
   <section>
     <base-card>
-      <base-badge v-for="area in coach.areas" :key="area" :title="area" :type="area"/>
-
+      <div class="badges">
+        <base-badge v-for="area in coach.areas" :key="area" :title="area" :type="area"/>
+    </div>
       <p>{{coach.description}}</p>
     </base-card>
   </section>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onBeforeMount } from 'vue'
+import { defineComponent, computed } from 'vue'
 import { useRoute} from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -62,10 +63,6 @@ export default defineComponent({
       return true;
     });
 
-    onBeforeMount(() => {
-      console.log('coach', coach.value);
-    });
-
     return {
       contactLink,
       isTopLevelPage,
@@ -84,5 +81,10 @@ export default defineComponent({
 
   .contact .btn {
     text-align: end;
+  }
+
+  .badges {
+    display: flex;
+    justify-content: center;
   }
 </style>
