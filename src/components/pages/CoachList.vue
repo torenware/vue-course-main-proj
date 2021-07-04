@@ -1,17 +1,22 @@
 <template>
-  <h2>Coach List</h2>
-  <section>
-    <div class="controls">
-      <button>Refresh</button>
-      <div>
-        <router-link to="/register">Become a Coach</router-link>
+  <base-card>
+    <section>
+      <div class="controls">
+        <base-button mode="outline">
+          Refresh
+        </base-button>
+        <div>
+          <base-button :link="true" to="/register">
+            Become a Coach
+          </base-button>
+        </div>
       </div>
-    </div>
-  </section>
-  <section>
-    <ul>
-      <li v-for="coach in coachList" :key="coach.id">
-        <coach-item 
+    </section>
+    <section>
+      <ul>
+        <coach-item
+          v-for="coach in coachList" 
+          :key="coach.id" 
           :id="coach.id"
           :first-name="coach.firstName"
           :last-name="coach.lastName"
@@ -19,9 +24,9 @@
           :areas="coach.areas"
           :hourly-rate="coach.hourlyRate"
         />
-      </li>
-    </ul>
-  </section>
+      </ul>
+    </section>
+  </base-card>
 </template>
 
 <script lang="ts">
@@ -48,7 +53,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-li {
-  list-style: none;
+div.controls {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

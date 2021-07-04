@@ -1,22 +1,25 @@
 <template>
-  <base-container>
+  <li>
     <h3>{{fullName}}</h3>
     <h4>${{hourlyRate.toFixed(2)}} / hour</h4>
     <div>
-      <span v-for="area in areas" :key="area">{{area}}</span>
+      <base-badge v-for="area in areas" :key="area" :title="area" :type="area"/>
     </div>
     <div class="actions">
-      <router-link :to="coachContactLink">Contact Coach</router-link>
-      <router-link :to="coachLink">Coach Details</router-link>
+      <base-button :link="true" :to="coachContactLink" mode="outline">Contact Coach</base-button>
+      <base-button :link="true" :to="coachLink"  mode="outline">Coach Details</base-button>
+      
     </div>
-  </base-container>
+  </li>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
+import BaseButton from '../UI/BaseButton.vue';
 
 export default defineComponent({
+  components: { BaseButton },
   props: {
     id: {
       type: String,
@@ -69,7 +72,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
+/**
 .actions a, span {
   display: inline-block;
   border-style: double;
@@ -80,12 +83,14 @@ export default defineComponent({
   text-decoration: none;
   border-radius: 10px;
 }
+ */
 
 li {
   margin: 1rem 0;
   border: 1px solid #424242;
   border-radius: 12px;
   padding: 1rem;
+  list-style: none;
 }
 
 h3 {
