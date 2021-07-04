@@ -1,3 +1,3 @@
 <template>
-  <h1>Register On Our Site</h1>
+  <h2>Register As a Coach on Our Site</h2>
 </template>

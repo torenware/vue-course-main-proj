@@ -1,3 +1,3 @@
 <template>
-  <h1>View Your Requests</h1>
+  <h2>View Your Requests</h2>
 </template>
