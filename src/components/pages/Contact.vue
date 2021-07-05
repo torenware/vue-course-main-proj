@@ -4,9 +4,9 @@
   <form @submit.prevent="">
     <base-form-control>
       <template #default="slotProps">
-        <label for="title">Subject</label>
         <input id="title"
           type="text"
+          placeholder="Subject of Your Post"
           required
           @invalid="slotProps.notify('invalid')"
           @change="slotProps.notify('change')"
@@ -17,7 +17,6 @@
 
     <base-form-control>
       <template #default="slotProps">
-      <label for="message">Message</label>
       <textarea rows="5" cols="40"
           placeholder="Your message here"
           required
@@ -73,10 +72,13 @@ export default defineComponent({
    align-items: flex-start;
  }
 
- input, textarea {
-   margin: 10px 20px;
-   flex: 1;
- }
+ input, label {
+  height: 2.5rem;
+}
+
+input, textarea {
+  flex: 1;
+}
 
  form div.error.invalid {
    display: none;
@@ -84,6 +86,8 @@ export default defineComponent({
  .form-control.invalid {
     input, label, textarea {
       color: red;
+      border-style: solid;
+      border-color: red;
     }
  }
 

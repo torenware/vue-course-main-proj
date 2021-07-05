@@ -4,9 +4,7 @@
        :class="invalidClass"
        @invalid="handleInvalid"
   >
-    <div class="control">
-      <slot :notify="notifyFC"></slot>
-    </div>
+    <slot :notify="notifyFC"></slot>
     <div class="error" v-if="getMessage && !controlValid">
       {{ getMessage }}
     </div>
@@ -127,7 +125,7 @@ export default defineComponent({
 <style lang="scss" scoped>
   div.form-control {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 
     // &.control {
     //   display: flex;
@@ -143,6 +141,9 @@ export default defineComponent({
     input, label, textarea, select, div.error {
       color: red;
       border-color: lightcoral;
+    }
+    div.error {
+      padding-left: 10px;
     }
    }
   }

@@ -1,17 +1,41 @@
 <template>
   <section>
     <base-card>
-      <h3>Register as a Coach With Us!</h3>
+      <h2>Register as a Coach With Us!</h2>
       <form @submit.prevent="submitInfo">
-        <div class="form-control">
-          <input type="text" placeholder="First Name" v-model.trim="firstName">
-        </div>
-        <div class="form-control">
-          <input type="text" placeholder="Last Name" v-model.trim="lastName" >
-        </div>
-        <div class="form-control">
-          <input type="number" placeholder="Hourly Rate (US $)" v-model.number="hourlyRate">
-        </div>
+        <base-form-control>
+          <template #default="slotProps">
+          <input type="text"
+                 placeholder="First Name"
+                 required
+                @invalid="slotProps.notify('invalid')"
+                @change="slotProps.notify('change')"
+                @blur="slotProps.notify('blur')"
+                 v-model.trim="firstName">
+          </template>
+        </base-form-control>
+        <base-form-control>
+          <template #default="slotProps">
+          <input type="text"
+                 placeholder="Last Name"
+                 required
+                @invalid="slotProps.notify('invalid')"
+                @change="slotProps.notify('change')"
+                @blur="slotProps.notify('blur')"
+                 v-model.trim="lastName" >
+          </template>
+        </base-form-control>
+        <base-form-control>
+          <template #default="slotProps">
+          <input type="number"
+                 placeholder="Hourly Rate (US $)"
+                 required
+                @invalid="slotProps.notify('invalid')"
+                @change="slotProps.notify('change')"
+                @blur="slotProps.notify('blur')"
+                 v-model.number="hourlyRate">
+          </template>
+        </base-form-control>
         <div class="form-control cgroup">
           <h4>Your Areas of Expertise</h4>
           <div class="checkbox-group">
@@ -26,13 +50,19 @@
             </div>
           </div>
         </div>
-        <div class="form-control">
+        <base-form-control>
+          <template #default="slotProps">
           <textarea
                placeholder="Short description or bio"
                v-model.trim="description"
+               required
+                @invalid="slotProps.notify('invalid')"
+                @change="slotProps.notify('change')"
+                @blur="slotProps.notify('blur')"
                rows="5"
           />
-        </div>
+          </template>
+        </base-form-control>
         <base-button>
           Submit Your Info
         </base-button>
@@ -44,7 +74,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 // useStore has been overloaded.
-import { useStore } from '@/store';
+// import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
@@ -55,9 +85,24 @@ export default defineComponent({
     const hourlyRate = ref(null);
     const description = ref('');
 
-    const store = useStore();
+    //const store = useStore();
 
-    const submitInfo = () => {
+    function hasInvalidControl(evt: Event): boolean {
+      if (evt.type === 'submit') {
+        // @ts-ignore
+        const invalid = evt.target!.querySelector(':invalid');
+        if (invalid) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const submitInfo = (evt: Event) => {
+      if (hasInvalidControl(evt)) {
+        alert('submit blocked');
+        return;
+      }
       const payload = {
         firstName: firstName.value,
         lastName: lastName.value,
@@ -65,7 +110,9 @@ export default defineComponent({
         hourlyRate: parseFloat(hourlyRate.value!),
         areas: areas.value
       };
-      store.dispatch('addCoach', payload);
+      console.log(payload);
+      alert('would submit here');
+      //store.dispatch('addCoach', payload);
     };
 
     return {
@@ -126,4 +173,13 @@ input, textarea {
   }
 
 }
+
+.form-control.invalid {
+  input, label, textarea {
+    color: red;
+    border-style: solid;
+    border-color: red;
+  }
+}
+
 </style>
