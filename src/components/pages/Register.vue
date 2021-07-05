@@ -36,10 +36,14 @@
                  v-model.number="hourlyRate">
           </template>
         </base-form-control>
-        <div class="form-control cgroup">
-          <h4>Your Areas of Expertise</h4>
+        <div class="form-control cgroup"  ref="areaCGroup">
+          <h4>Your Areas of Expertise (choose one or more)</h4>
           <div class="checkbox-group">
-            <div class="checkbox" v-for="area in allowedAreas" :key="area">
+            <div class="checkbox"
+                  v-for="area in allowedAreas"
+                  :key="area"
+                  @change="checkBoxChanged"
+              >
               <label>
                 <input type="checkbox"
                   :value="area"
@@ -74,18 +78,19 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 // useStore has been overloaded.
-// import { useStore } from '@/store';
+import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
     const allowedAreas = ['frontend', 'backend', 'career'];
     const areas = ref([]);
+    const areaCGroup = ref(null);
     const firstName = ref('');
     const lastName = ref('');
     const hourlyRate = ref(null);
     const description = ref('');
 
-    //const store = useStore();
+    const store = useStore();
 
     function hasInvalidControl(evt: Event): boolean {
       if (evt.type === 'submit') {
@@ -98,9 +103,47 @@ export default defineComponent({
       return false;
     }
 
+    function validateAreaGroup() {
+      if (!areaCGroup.value) {
+        console.log('cgroup ref not inititalized');
+        return true;
+      }
+      const group = areaCGroup.value! as Element;
+      const checked = group.querySelectorAll(':checked');
+      if (checked.length === 0) {
+        return false;
+      }
+      return true;
+    }
+
+    function markAreaGroupValidity(isValid: boolean) {
+      if (!areaCGroup.value) {
+        console.log('cgroup ref not inititalized');
+        return;
+      }
+      const group = areaCGroup.value! as Element;
+      const hasInvalidClass = group.classList.contains('invalid');
+      if (isValid) {
+        if (hasInvalidClass) {
+          group.classList.remove('invalid');
+        }
+      }
+      else {
+        if (!hasInvalidClass) {
+          group.classList.add('invalid');
+        }
+      }
+    }
+
+    function checkBoxChanged() {
+      const groupValid = validateAreaGroup();
+      markAreaGroupValidity(groupValid);
+    }
+
     const submitInfo = (evt: Event) => {
-      if (hasInvalidControl(evt)) {
-        alert('submit blocked');
+      const areasOK = validateAreaGroup();
+      markAreaGroupValidity(areasOK);
+      if (!areasOK || hasInvalidControl(evt)) {
         return;
       }
       const payload = {
@@ -110,18 +153,18 @@ export default defineComponent({
         hourlyRate: parseFloat(hourlyRate.value!),
         areas: areas.value
       };
-      console.log(payload);
-      alert('would submit here');
-      //store.dispatch('addCoach', payload);
+      store.dispatch('addCoach', payload);
     };
 
     return {
       allowedAreas,
       areas,
+      areaCGroup,
       firstName,
       lastName,
       hourlyRate,
       description,
+      checkBoxChanged,
       submitInfo
     };
 
@@ -179,6 +222,14 @@ input, textarea {
     color: red;
     border-style: solid;
     border-color: red;
+  }
+}
+.cgroup.invalid {
+  input, h4, label {
+    color: red;
+    border-style: none;
+    border-color: none;
+
   }
 }
 
