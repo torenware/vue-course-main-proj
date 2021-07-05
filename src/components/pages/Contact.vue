@@ -3,20 +3,29 @@
   <base-card>
   <form @submit.prevent="">
     <base-form-control>
-      <label for="title">Subject</label>
-      <input id="title"
-         type="text"
-         required
-         v-model.trim="subject">
+      <template #default="slotProps">
+        <label for="title">Subject</label>
+        <input id="title"
+          type="text"
+          required
+          @invalid="slotProps.notify('invalid')"
+          @change="slotProps.notify('change')"
+          @blur="slotProps.notify('blur')"
+          v-model.trim="subject">
+         </template>
     </base-form-control>
 
     <base-form-control>
+      <template #default="slotProps">
       <label for="message">Message</label>
       <textarea rows="5" cols="40"
           placeholder="Your message here"
           required
+          @invalid="slotProps.notify('invalid')"
+          @change="slotProps.notify('change')"
+          @blur="slotProps.notify('blur')"
           v-model.trim="message"></textarea>
-
+      </template>
     </base-form-control>
 
     <base-button mode="outline">Send</base-button>
@@ -54,7 +63,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
  label {
    display: block;
  }
@@ -67,6 +76,15 @@ export default defineComponent({
  input, textarea {
    margin: 10px 20px;
    flex: 1;
+ }
+
+ form div.error.invalid {
+   display: none;
+ }
+ .form-control.invalid {
+    input, label, textarea {
+      color: red;
+    }
  }
 
 

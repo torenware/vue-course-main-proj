@@ -4,8 +4,10 @@
        :class="invalidClass"
        @invalid="handleInvalid"
   >
-    <slot></slot>
-    <div class="error invalid" v-if="getMessage">
+    <div class="control">
+      <slot :notify="notifyFC"></slot>
+    </div>
+    <div class="error" v-if="getMessage && !controlValid">
       {{ getMessage }}
     </div>
   </div>
@@ -13,7 +15,7 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed,  onMounted } from 'vue'
 
 export default defineComponent({
   props: {
@@ -22,9 +24,10 @@ export default defineComponent({
       required: false
     }
   },
-  setup() {
+  setup(_, context) {
     const formControl = ref(null);
     const controlValid = ref(true);
+    // const listeningControls = ref([]);
 
     const invalidClass = computed(() => {
       if (!controlValid.value) {
@@ -35,8 +38,21 @@ export default defineComponent({
       }
     });
 
-    function handleInvalid(evt: Event){
-      console.log(evt.target);
+    function notifyFC(evtType: string) {
+      console.log("received", evtType);
+      switch(evtType) {
+        case 'invalid':
+          return handleInvalid();
+        case 'change':
+        case 'blur':
+          return handleChange();
+        default:
+          return;
+      }
+    }
+
+    function handleInvalid(){
+      console.log('CV flipped to false');
       controlValid.value = false;
     }
 
@@ -45,15 +61,19 @@ export default defineComponent({
         return; // not up yet.
       }
       // @ts-ignore
-      const control = formControl.value.querySelector('input:invalid,textarea:invalid');
-      console.log('control', control);
-      if (!control) {
+      const control = formControl.value.querySelectorAll('input,textarea');
+      if (!control.length) {
         return;
       }
       let isValid = true;
       control.forEach((ctl: HTMLObjectElement) => {
-        ctl;
-        isValid = false;
+        if (!ctl.checkValidity()) {
+          isValid = false;
+          console.log('still invalid');
+        }
+        else {
+          console.log('valid now');
+        }
       });
       if (isValid && !controlValid.value) {
         controlValid.value = true;
@@ -77,6 +97,19 @@ export default defineComponent({
       controlValid.value = true;
     }
 
+    onMounted(() => {
+      if (formControl.value) {
+        // @ts-ignore
+        const controls = formControl.value!.querySelectorAll('input,textarea,select');
+        controls.forEach((ctl: Element) => {
+          ctl.addEventListener('invalid', () => {
+            console.log('control got invalid');
+            context.emit('invalid');
+          });
+        });
+      }
+    })
+
     return {
       formControl,
       controlValid,
@@ -84,17 +117,33 @@ export default defineComponent({
       handleInvalid,
       invalidClass,
       resetValid,
-      getMessage: computed(getMessage)
+      getMessage: computed(getMessage),
+      notifyFC
     };
   },
 })
 </script>
 
 <style lang="scss" scoped>
-  div.form-control.invalid {
-    input, label, textarea, select {
+  div.form-control {
+    display: flex;
+    flex-direction: column;
+
+    // &.control {
+    //   display: flex;
+    //   flex-direction: column;
+    // }
+
+    input, textarea {
+      flex: 1;
+      margin: 0;
+    }
+
+    &.invalid {
+    input, label, textarea, select, div.error {
       color: red;
       border-color: lightcoral;
     }
+   }
   }
 </style>

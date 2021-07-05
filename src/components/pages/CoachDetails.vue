@@ -26,7 +26,7 @@
   </section>
   <section>
     <base-card>
-      <div class="badges" v-if="coach">
+      <div class="badges" v-if="coach && coach.areas">
         <base-badge v-for="area in coach.areas" :key="area" :title="area" :type="area"/>
     </div>
       <p>{{coach.description}}</p>
