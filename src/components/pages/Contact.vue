@@ -1,7 +1,10 @@
 <template>
-  <h3>Contact Form</h3>
+  <h3>
+    {{ coach ? `Contact Form for ${coach.firstName} ${coach.lastName}`: "Contact Form"}}
+    </h3>
   <base-card>
-  <form @submit.prevent="">
+
+  <form @submit.prevent="submitContact" v-if="coach">
     <base-form-control>
       <template #default="slotProps">
         <input id="title"
@@ -12,6 +15,19 @@
           @change="slotProps.notify('change')"
           @blur="slotProps.notify('blur')"
           v-model.trim="subject">
+         </template>
+    </base-form-control>
+
+    <base-form-control custom-msg="Please enter a valid email">
+      <template #default="slotProps">
+        <input id="email"
+          type="email"
+          placeholder="Contact Email"
+          required
+          @invalid="slotProps.notify('invalid')"
+          @change="slotProps.notify('change')"
+          @blur="slotProps.notify('blur')"
+          v-model.trim="email">
          </template>
     </base-form-control>
 
@@ -29,32 +45,49 @@
 
     <base-button mode="outline">Send</base-button>
   </form>
-
+  <div v-else>
+    <p>Sorry! Contacting this coach is not available now for this coach</p>
+  </div>
   </base-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, inject } from 'vue';
 import { useRoute } from 'vue-router';
+import type { Coach } from '@/types';
+import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
-
+    const store = useStore();
     const subject = ref('');
+    const email = ref('');
     const message = ref('');
+
+    const initializeFlash = inject<Function>('initializeFlash');
 
     const idParam = computed(() => {
       const {params} = useRoute();
       return params.id;
     });
 
+    const coach = computed(() => {
+      const rslt: Coach | null = store.getters.coachById(idParam.value);
+      return rslt;
+    });
+
     const submitContact = () => {
       console.log('submit called');
+      store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
+      window.scrollTo(0, 0);
+      initializeFlash!();
     }
 
     return {
       idParam,
+      coach,
       subject,
+      email,
       message,
       submitContact,
     }

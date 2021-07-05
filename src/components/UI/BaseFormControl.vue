@@ -17,12 +17,12 @@ import { defineComponent, ref, computed,  onMounted } from 'vue'
 
 export default defineComponent({
   props: {
-    msg: {
+    customMsg: {
       type: String,
       required: false
     }
   },
-  setup(_, context) {
+  setup(props, context) {
     const formControl = ref(null);
     const controlValid = ref(true);
     // const listeningControls = ref([]);
@@ -37,7 +37,6 @@ export default defineComponent({
     });
 
     function notifyFC(evtType: string) {
-      console.log("received", evtType);
       switch(evtType) {
         case 'invalid':
           return handleInvalid();
@@ -50,7 +49,6 @@ export default defineComponent({
     }
 
     function handleInvalid(){
-      console.log('CV flipped to false');
       controlValid.value = false;
     }
 
@@ -67,10 +65,6 @@ export default defineComponent({
       control.forEach((ctl: HTMLObjectElement) => {
         if (!ctl.checkValidity()) {
           isValid = false;
-          console.log('still invalid');
-        }
-        else {
-          console.log('valid now');
         }
       });
       if (isValid && !controlValid.value) {
@@ -81,6 +75,9 @@ export default defineComponent({
     function getMessage() {
       if (!formControl.value) {
         return "";
+      }
+      if (props.customMsg) {
+        return props.customMsg;
       }
       // @ts-ignore
       const control = formControl.value.querySelector('input,textarea');
@@ -96,12 +93,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      console.log('custom msg', props.customMsg);
       if (formControl.value) {
         // @ts-ignore
         const controls = formControl.value!.querySelectorAll('input,textarea,select');
         controls.forEach((ctl: Element) => {
           ctl.addEventListener('invalid', () => {
-            console.log('control got invalid');
             context.emit('invalid');
           });
         });

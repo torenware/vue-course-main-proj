@@ -3,6 +3,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex';
 
 import type { Coach } from '@/types';
 import fetcher from './fetcher';
+import flashStore, { FlashStore } from './flash';
 
 interface CoachList {
   coaches: Coach[];
@@ -30,23 +31,31 @@ async function loadData(): Promise<Coach[]> {
 
 // Create a new store instance.
 const store = createStore({
-  state() {
+  modules: {
+    flash: flashStore,
+  },
+  // @ts-ignore
+  state () {
     return {
       coaches: []
     };
   },
   mutations: {
+    // @ts-ignore
     initStore(state: CoachList, coaches: Coach[]) {
       state.coaches = coaches;
     },
     addCoach(state, coach: Coach) {
+      // @ts-ignore
       state.coaches.push(coach);
     }
   },
   getters: {
+    // @ts-ignore
     coaches(state: CoachList): Coach[] {
       return state.coaches;
     },
+    // @ts-ignore
     coachById(state: CoachList) {
       return (id: string): Coach | null => {
         if (!state.coaches) {
