@@ -3,17 +3,11 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex';
 
 import type { Coach } from '@/types';
 import fetcher from './fetcher';
-import flashStore, { FlashStore } from './flash';
+import flashStore from './flash';
+import requestStore from './requests';
 
 interface CoachList {
   coaches: Coach[];
-}
-
-interface FetchOptions {
-  method: string;
-  // path to resource
-  res: string;
-  body?: object;
 }
 
 export const key: InjectionKey<Store<CoachList>> = Symbol()
@@ -32,7 +26,10 @@ async function loadData(): Promise<Coach[]> {
 // Create a new store instance.
 const store = createStore({
   modules: {
+    // @ts-ignore
     flash: flashStore,
+    // @ts-ignore
+    requests: requestStore
   },
   // @ts-ignore
   state () {

@@ -78,6 +78,13 @@ export default defineComponent({
 
     const submitContact = () => {
       console.log('submit called');
+      const newRequest = {
+        coachId: idParam.value,
+        title: subject.value,
+        email: email.value,
+        message: message.value
+      };
+      store.dispatch('requests/addRequest', newRequest);
       store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
       window.scrollTo(0, 0);
       initializeFlash!();

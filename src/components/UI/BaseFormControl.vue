@@ -93,7 +93,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      console.log('custom msg', props.customMsg);
       if (formControl.value) {
         // @ts-ignore
         const controls = formControl.value!.querySelectorAll('input,textarea,select');

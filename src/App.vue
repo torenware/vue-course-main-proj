@@ -20,11 +20,14 @@ export default defineComponent({
   },
   setup() {
     const loaded = ref(false);
+    const loadedRequests = ref(false);
     provide('loaded', loaded);
+    provide('loadedRequests', loadedRequests);
     const displayFlash = ref(false);
 
     const store = useStore();
     store.dispatch('loadStore', loaded);
+    store.dispatch('requests/loadRequests', loadedRequests);
 
     function initializeFlash() {
       const hasFlash = store.getters.hasFlash;
