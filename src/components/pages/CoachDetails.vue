@@ -1,8 +1,12 @@
 <template>
+  <div v-if="!loaded" >
+    Loading...
+  </div>
+  <div v-else>
   <section>
     <base-card>
       <h2>{{ fullName }}</h2>
-      <h3>${{ coach.hourlyRate.toFixed(2)}} / hour</h3>
+      <h3>${{ coach ? coach.hourlyRate.toFixed(2) : ""}} / hour</h3>
     </base-card>
   </section>
   <section>
@@ -22,36 +26,47 @@
   </section>
   <section>
     <base-card>
-      <div class="badges">
+      <div class="badges" v-if="coach">
         <base-badge v-for="area in coach.areas" :key="area" :title="area" :type="area"/>
     </div>
       <p>{{coach.description}}</p>
     </base-card>
   </section>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, inject, ref, Ref } from 'vue'
 import { useRoute} from 'vue-router';
 import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
+    const loaded: Ref<boolean> = inject('loaded', ref(false));
     const route = useRoute();
+    const store = useStore();
     const contactLink = computed(() => {
       return `/coaches/${route.params.id}/contact`;
     });
 
     const coach = computed(() => {
-      const store = useStore();
       const id = route.params.id;
+      if (!loaded.value) {
+        return null;
+      }
       return store.getters.coachById(id);
     });
 
     const fullName = computed(() => {
-      const store = useStore();
+      if (!loaded.value) {
+        return "";
+      }
       const id = route.params.id;
-      return store.getters.fullName(id);
+      const rslt = store.getters.coachById(id);
+      if (rslt) {
+        return `${rslt.firstName} ${rslt.lastName}`;
+      }
+      return "";
     });
 
     const isTopLevelPage = computed(() => {
@@ -67,7 +82,8 @@ export default defineComponent({
       contactLink,
       isTopLevelPage,
       coach,
-      fullName
+      fullName,
+      loaded
     };
   },
 })

@@ -1,5 +1,8 @@
 <template>
-  <base-card>
+  <div v-if="!loaded">
+    Loading...
+  </div>
+  <base-card v-else>
     <section>
       <div class="controls">
         <base-search  @search="doSearch" />
@@ -34,7 +37,7 @@
 
 <script lang="ts">
 import { Coach } from '@/types';
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, inject } from 'vue';
 import { useStore } from '@/store';
 
 import CoachItem from '../coaches/CoachItem.vue';
@@ -46,7 +49,7 @@ export default defineComponent({
     BaseSearch
   },
   setup() {
-
+    const loaded = inject('loaded');
     const fullName = (coach: Coach) => {
       return `${coach.firstName} ${coach.firstName}`;
     };
@@ -60,7 +63,6 @@ export default defineComponent({
     const coachList = computed(() => {
       const store = useStore();
       const coaches = store.getters.coaches;
-      console.log('ST:', searchTerm.value);
       if (searchTerm.value === '') {
         return coaches;
       }
@@ -74,7 +76,8 @@ export default defineComponent({
     return {
       coachList,
       searchTerm,
-      doSearch
+      doSearch,
+      loaded
     };
   },
 })

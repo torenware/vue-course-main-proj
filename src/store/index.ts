@@ -49,30 +49,46 @@ const store = createStore({
     },
     coachById(state: CoachList) {
       return (id: string): Coach | null => {
-        const coach = state.coaches.find(item => {
-          return item.id === id;
-        });
-        return coach || null;
+        if (!state.coaches) {
+          //early in app history we may not yet be loaded
+          return null;
+        }
+        try {
+          const coach = state.coaches.find(item => {
+            return item.id === id;
+          });
+          return coach || null;
+        }
+        catch(err) {
+          console.log('db not init yet');
+        }
+        return null;
       }
     },
     fullName(state, getters) {
       return (id: string) => {
-        const coach = getters.coachById(id);
-        if (coach) {
-          return `${coach.firstName} ${coach.lastName}`;
+        let coach = null;
+        try {
+          coach = getters.coachById(id);
+          if (coach) {
+            return `${coach.firstName} ${coach.lastName}`;
+          }
+        }
+        catch(err) {
+          console.log('db not yet up', err);
         }
         return '';
       }
     }
    },
    actions: {
-     async loadStore(context) {
+     async loadStore(context, loaded) {
        const coaches = await loadData();
        context.commit('initStore', coaches);
+       loaded.value = true;
      },
 
      async addCoach(context, newCoach) {
-       console.log('AC called');
        // @ts-ignore
        const id = Date.now().toFixed(0).toString(16);
        const rawCoach = {
@@ -80,10 +96,8 @@ const store = createStore({
         id
        };
        try {
-         console.log('received', rawCoach);
          const coach = await fetcher<Coach>('api/coaches', 'POST', rawCoach);
          context.commit('addCoach', coach);
-         console.log('got back', coach);
        }
        catch(e) {
          console.log(e);

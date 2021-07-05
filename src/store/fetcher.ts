@@ -20,6 +20,5 @@ export default async function fetcher<T>(
     options.body = payload;
   }
   const rslt = await fetch(url, options);
-  console.log('rslt', rslt);
   return rslt.json().then(data => data);
 }

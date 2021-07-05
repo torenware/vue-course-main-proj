@@ -7,7 +7,7 @@
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, provide } from 'vue';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue'
 
@@ -16,8 +16,15 @@ export default defineComponent({
     TheHeader
   },
   setup() {
+    const loaded = ref(false);
+    provide('loaded', loaded);
+
     const store = useStore();
-    store.dispatch('loadStore');
+    store.dispatch('loadStore', loaded);
+
+    return {
+
+    }
   }
 })
 </script>

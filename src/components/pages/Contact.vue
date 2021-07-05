@@ -2,14 +2,23 @@
   <h3>Contact Form</h3>
   <base-card>
   <form @submit.prevent="">
-    <div class="form-control">
+    <base-form-control>
       <label for="title">Subject</label>
-      <input id="title" type="text" v-model.trim="subject">
-    </div>
-    <div class="form-control">
+      <input id="title"
+         type="text"
+         required
+         v-model.trim="subject">
+    </base-form-control>
+
+    <base-form-control>
       <label for="message">Message</label>
-      <textarea rows="5" cols="40" placeholder="Your message here" v-model.trim="message"></textarea>
-    </div>
+      <textarea rows="5" cols="40"
+          placeholder="Your message here"
+          required
+          v-model.trim="message"></textarea>
+
+    </base-form-control>
+
     <base-button mode="outline">Send</base-button>
   </form>
 
@@ -17,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
@@ -29,22 +38,17 @@ export default defineComponent({
     const idParam = computed(() => {
       const {params} = useRoute();
       return params.id;
-    })
+    });
 
     const submitContact = () => {
-
+      console.log('submit called');
     }
-
-    onMounted(() => {
-      const stuff = useRoute();
-      console.log(stuff);
-    });
 
     return {
       idParam,
       subject,
       message,
-      submitContact
+      submitContact,
     }
   },
 })
