@@ -2,7 +2,7 @@
   <section>
     <base-card>
       <h2>Register as a Coach With Us!</h2>
-      <form @submit.prevent="submitInfo">
+      <form @submit.prevent="submitInfo" ref='regForm'>
         <base-form-control>
           <template #default="slotProps">
           <input type="text"
@@ -70,13 +70,17 @@
         <base-button>
           Submit Your Info
         </base-button>
+        <base-button @click.prevent="clearForm" mode="outline">
+          Clear Form
+        </base-button>
       </form>
     </base-card>
   </section>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, inject, Ref } from 'vue';
+
 // useStore has been overloaded.
 import { useStore } from '@/store';
 
@@ -84,13 +88,16 @@ export default defineComponent({
   setup() {
     const allowedAreas = ['frontend', 'backend', 'career'];
     const areas = ref([]);
-    const areaCGroup = ref(null);
     const firstName = ref('');
     const lastName = ref('');
     const hourlyRate = ref(null);
     const description = ref('');
 
+    const areaCGroup = ref(null);
+    const regForm: Ref<HTMLFormElement> | Ref<null> = ref(null);
+
     const store = useStore();
+    const initializeFlash = inject<Function>('initializeFlash');
 
     function hasInvalidControl(evt: Event): boolean {
       if (evt.type === 'submit') {
@@ -140,6 +147,31 @@ export default defineComponent({
       markAreaGroupValidity(groupValid);
     }
 
+    function clearForm() {
+      if (!regForm.value) {
+        console.log('regform ref not up');
+        return;
+      }
+      console.log('clearing form...');
+      const controls = regForm.value.querySelectorAll('input,select,textarea');
+      controls.forEach(item => {
+        // @ts-ignore
+        if (item.tagName.toLowerCase() === 'input') {
+          const input = item as HTMLInputElement;
+          if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+          }
+          else {
+            input.value = '';
+          }
+        }
+        else {
+          // @ts-ignore
+          item.value = '';
+        }
+      });
+    }
+
     const submitInfo = (evt: Event) => {
       const areasOK = validateAreaGroup();
       markAreaGroupValidity(areasOK);
@@ -153,19 +185,31 @@ export default defineComponent({
         hourlyRate: parseFloat(hourlyRate.value!),
         areas: areas.value
       };
-      store.dispatch('addCoach', payload);
+      try {
+        store.dispatch('addCoach', payload);
+        store.dispatch('setFlash', 'Thank you for registering with us!');
+        clearForm();
+      }
+      catch (err) {
+        store.dispatch('setFlash', 'We were not able to connect to the database. Please try again later');
+      }
+      window.scroll(0,0);
+      initializeFlash!();
     };
 
     return {
       allowedAreas,
       areas,
       areaCGroup,
+      regForm,
       firstName,
       lastName,
       hourlyRate,
       description,
       checkBoxChanged,
-      submitInfo
+      submitInfo,
+      clearForm,
+      initializeFlash
     };
 
   },

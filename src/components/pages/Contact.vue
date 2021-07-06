@@ -84,8 +84,13 @@ export default defineComponent({
         email: email.value,
         message: message.value
       };
-      store.dispatch('requests/addRequest', newRequest);
-      store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
+      try {
+        store.dispatch('requests/addRequest', newRequest);
+        store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
+      }
+      catch (err) {
+        store.dispatch('setFlash', 'Sorry! We had a problem saving your message. Please try later.');
+      }
       window.scrollTo(0, 0);
       initializeFlash!();
     }

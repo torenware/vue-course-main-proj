@@ -37,6 +37,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/:notFound(.*)',
+    alias: '/404',
     component: NotFound
   }
 ];

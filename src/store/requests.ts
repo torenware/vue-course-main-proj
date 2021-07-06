@@ -47,7 +47,6 @@ const store: StoreOptions<RequestStore> = {
   },
   actions: {
     async addRequest(context, newRequest: Request) {
-      console.log('call API here');
       const tmpID = Date.now()
         .toFixed()
         .toString();
@@ -60,8 +59,7 @@ const store: StoreOptions<RequestStore> = {
         );
         context.commit('addRequest', request);
       } catch (e) {
-        console.log(e);
-        // emit error here?
+        throw new Error(e);
       }
     },
 
@@ -71,9 +69,8 @@ const store: StoreOptions<RequestStore> = {
         const requests = await fetcher<Request[]>('api/requests', 'GET');
         context.commit('loadRequests', requests);
         loaded.value = true;
-        console.log('requests loaded');
       } catch (err) {
-        console.log('Problem fetching requests', err);
+        throw new Error(err);
       }
     }
   }

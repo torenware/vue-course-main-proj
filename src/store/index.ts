@@ -18,8 +18,7 @@ async function loadData(): Promise<Coach[]> {
     return coaches;
   }
   catch(err) {
-    console.log('Problem fetching', err);
-    return [];
+    throw new Error(err);
   }
 }
 
@@ -81,9 +80,8 @@ const store = createStore({
           }
         }
         catch(err) {
-          console.log('db not yet up', err);
+          throw new Error('db not yet up');
         }
-        return '';
       }
     }
    },
@@ -105,9 +103,8 @@ const store = createStore({
          const coach = await fetcher<Coach>('api/coaches', 'POST', rawCoach);
          context.commit('addCoach', coach);
        }
-       catch(e) {
-         console.log(e);
-         // emit error here?
+       catch(err) {
+         throw new Error(err);
        }
      }
    }

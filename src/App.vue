@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, provide,  onMounted, onUpdated  } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
 import BaseFlash from './components/UI/BaseFlash.vue';
@@ -21,13 +22,25 @@ export default defineComponent({
   setup() {
     const loaded = ref(false);
     const loadedRequests = ref(false);
+    const fubar = ref(false);
     provide('loaded', loaded);
     provide('loadedRequests', loadedRequests);
+    provide('fubar', fubar);
     const displayFlash = ref(false);
 
     const store = useStore();
-    store.dispatch('loadStore', loaded);
-    store.dispatch('requests/loadRequests', loadedRequests);
+    const router = useRouter();
+
+    try {
+      store.dispatch('loadStore', loaded);
+      store.dispatch('requests/loadRequests', loadedRequests);
+    }
+    catch (err) {
+      // Regretably not much to do here.  Not even the router
+      // is up yet!
+      console.error('App data failed to load from server:', err);
+      fubar.value = true;
+    }
 
     function initializeFlash() {
       const hasFlash = store.getters.hasFlash;
@@ -41,8 +54,12 @@ export default defineComponent({
     }
     provide('initializeFlash', initializeFlash);
 
-
     onMounted(() => {
+      if (fubar.value) {
+        store.dispatch('setFlash', 'Sorry! The database failed to load for us!');
+        router.push('/404');
+      }
+
       initializeFlash();
     });
 
