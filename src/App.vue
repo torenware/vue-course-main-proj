@@ -12,12 +12,10 @@ import { defineComponent, ref, provide,  onMounted, onUpdated  } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
-import BaseFlash from './components/UI/BaseFlash.vue';
 
 export default defineComponent({
   components: {
     TheHeader,
-    BaseFlash
   },
   setup() {
     const loaded = ref(false);

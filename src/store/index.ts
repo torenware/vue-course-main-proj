@@ -106,6 +106,22 @@ const store = createStore({
        catch(err) {
          throw new Error(err);
        }
+     },
+
+     // For route guards, since they may need to execute
+     // too early for a full load.
+     async validateCoach(context, coachId) {
+       // First, see if we have a record.
+       // @ts-ignore
+       let coach = context.state.coaches.find(ch => ch.id === coachId);
+       if (!coach) {
+         // May be we just haven't loaded. So check the DB directly.
+         // If we throw, the router will handle this.
+         coach = await fetcher<Coach>('api/coaches/' + coachId, 'GET');
+         if (!coach) {
+           throw new Error('Coach not found');
+         }
+       }
      }
    }
 

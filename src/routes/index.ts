@@ -6,6 +6,7 @@ import Register from '../components/pages/Register.vue';
 import Contact from '../components/pages/Contact.vue';
 import RequestList from '../components/pages/RequestList.vue';
 import NotFound from '../components/pages/NotFound.vue';
+import store from '@/store';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -19,6 +20,18 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/coaches/:id',
     component: CoachDetails,
+    beforeEnter: to => {
+      const cid = to.params.id;
+      try {
+        // This will either succeed silently, or
+        // throw.
+        store.dispatch('validateCoach', cid);
+        return true;
+      } catch (err) {
+        // Something catestrophically wrong...
+        return '/404';
+      }
+    },
     children: [
       {
         path: 'contact',
@@ -36,8 +49,11 @@ const routes: RouteRecordRaw[] = [
     component: RequestList
   },
   {
+    path: '/404',
+    component: NotFound
+  },
+  {
     path: '/:notFound(.*)',
-    alias: '/404',
     component: NotFound
   }
 ];
