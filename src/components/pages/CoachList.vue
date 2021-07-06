@@ -1,11 +1,14 @@
 <template>
+  <coach-finder
+    @update-areas="updateAreas"
+    @update-search-term="doSearch"
+  />
   <div v-if="!loaded">
     Loading...
   </div>
   <base-card v-else>
     <section>
       <div class="controls">
-        <base-search  @search="doSearch" />
         <div class='control-buttons'>
           <base-button mode="outline">
             Refresh
@@ -37,38 +40,52 @@
 
 <script lang="ts">
 import { Coach } from '@/types';
-import { defineComponent, computed, ref, inject } from 'vue';
+import { defineComponent, computed, ref, Ref, inject } from 'vue';
 import { useStore } from '@/store';
 
 import CoachItem from '../coaches/CoachItem.vue';
-import BaseSearch from '../UI/BaseSearch.vue';
+import CoachFinder from '../coaches/CoachFinder.vue';
+import areas from '@/utils/areas';
 
 export default defineComponent({
   components: {
     CoachItem,
-    BaseSearch
+    CoachFinder
   },
   setup() {
     const loaded = inject('loaded');
     const fullName = (coach: Coach) => {
-      return `${coach.firstName} ${coach.firstName}`;
+      return `${coach.firstName} ${coach.lastName}`;
     };
 
     const searchTerm = ref('');
+    const selectedAreas: Ref<string[]> = ref(areas);
 
     function doSearch(term: string) {
       searchTerm.value = term;
     }
 
+    function updateAreas(selected: string[]) {
+      selectedAreas.value = selected;
+    }
+
     const coachList = computed(() => {
       const store = useStore();
       const coaches = store.getters.coaches;
-      if (searchTerm.value === '') {
-        return coaches;
-      }
       const ucTerm = searchTerm.value.toUpperCase();
       return  coaches.filter((coach: Coach) => {
-        return fullName(coach).toUpperCase().includes(ucTerm);
+        let sharesGroup = false;
+        coach.areas.map(area => {
+           if (selectedAreas.value.includes(area)){
+             sharesGroup = true;
+           }
+        });
+        if (!sharesGroup) {
+          return false;
+        }
+        const searchThis = fullName(coach).toUpperCase();
+        console.log(searchThis);
+        return searchThis.includes(ucTerm);
       });
     });
 
@@ -77,6 +94,8 @@ export default defineComponent({
       coachList,
       searchTerm,
       doSearch,
+      updateAreas,
+      selectedAreas,
       loaded
     };
   },
@@ -95,4 +114,5 @@ div.control-buttons {
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
 </style>

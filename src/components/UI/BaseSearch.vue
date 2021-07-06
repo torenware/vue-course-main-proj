@@ -1,12 +1,19 @@
 <template>
   <form>
-    <input type="search" @input="search" :value="searchTerm" placeholder="Filter items" />
+    <input type="search" @input="search"
+          :value="searchTerm" :placeholder="widgetPlaceholder" />
   </form>
 </template>
 
 <script>
 export default {
   emits: ['search'],
+  props: {
+    placeholder: {
+      type: String,
+      required: false
+    }
+  },
   data() {
     return {
       searchTerm: ''
@@ -17,6 +24,16 @@ export default {
       this.$emit('search', event.target.value);
     },
   },
+  computed: {
+    widgetPlaceholder() {
+      if (this.placeholder) {
+        return this.placeholder;
+      }
+      else {
+        return "Filter items";
+      }
+    }
+  }
 };
 </script>
 
@@ -26,7 +43,9 @@ input {
   width: 100%;
   display: block;
   padding: 0.15rem;
+  padding-left: 1rem;
   border: 1px solid #ccc;
+  height: 2rem;
 }
 
 input:focus {
