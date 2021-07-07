@@ -1,20 +1,14 @@
-import axios from 'axios';
-import https from 'https';
-import fs, { promises } from 'fs';
-import util from 'util';
-import jwt from 'jsonwebtoken';
-import { exec as oldExec } from 'child_process';
+const axios = require('axios');
+const https = require('https');
+const fs = require('fs');
+const promises = fs.promises;
+const jwt = require('jsonwebtoken');
 
-
-const exec = util.promisify(oldExec);
-
-const getDomain = async () => {
+const getDomain = () => {
   return 'localhost:3005';
 };
 
-
-
-const domain = await getDomain();
+const domain = getDomain();
 
 const options = {
   httpsAgent: new https.Agent({
@@ -44,13 +38,13 @@ function getTokenData(token) {
   return data;
 }
 
-const writeCookie = async (data) => {
-  await promises.writeFile('./cookies.txt', data);
+const writeCookie = (data) => {
+  fs.writeFileSync('./cookies.txt', data);
 };
 
-const writeToken = async (data) => {
+const writeToken = (data) => {
   console.log('writing token');
-  await promises.writeFile('./token.txt', data);
+  fs.writeFileSync('./token.txt', data);
 }
 
 const loadCookie = () => {
@@ -85,32 +79,65 @@ const loadToken = () => {
   return null;
 };
 
-export const getTest = async () => {
+const buildAxiosParams = params => {
+  const axiosParams = new URLSearchParams();
+  for (let key of Object.keys(params)) {
+    axiosParams.append(key, params[key]);
+  }
+  return axiosParams;
+}
+
+const getTest = () => {
   const url = `http://${domain}/auth/signup`;
+  let resp;
   try {
-    const resp = await axios.get(url, loadOptions('token'));
-    return resp.data;
+    axios.get(url, loadOptions('token'))
+      .then(data => {
+        resp = data;
+        throw 'got-data';
+      })
+      .catch(err => {
+        if (err === 'got-data') {
+          console.log('got data 1', resp.data);
+          return;
+        }
+        throw new Error(err);
+      });
   }
   catch (err) {
     console.log(err.toString());
   }
-  return [];
+  return resp && resp.data ? resp.data : '';
 }
 
-export const signupUser = async (name, email, password) => {
+
+const signupUser = async (name, email, password) => {
   const url = `http://${domain}/auth/signup`;
   const data = {
     name,
     password,
     email
   }
+  let resp;
   try {
-    const resp = await axios.post(url, data, loadOptions());
-    if (resp.data && resp.data.token) {
-      await writeToken(resp.data.token);
-      const payload = getTokenData(resp.data.token);
-      console.log('token:', payload);
-    }
+    axios.post(url, data, loadOptions())
+      .then(data => {
+        resp = data;
+        if (resp.data && resp.data.token) {
+          writeToken(resp.data.token);
+          const payload = getTokenData(resp.data.token);
+          console.log('token:', payload);
+        }
+        throw 'got-data';
+      })
+      .catch(err => {
+        if (err === 'got-data') {
+          console.log('got data 1', resp.data);
+          return;
+        }
+        throw new Error(err);
+      });
+
     return resp.data;
   }
   catch (err) {
@@ -122,23 +149,32 @@ export const signupUser = async (name, email, password) => {
   return [];
 }
 
-const signin = async (email, password) => {
+const signin = (email, password) => {
   const url = `http://${domain}/auth/signin`;
-
+  let resp;
   try {
-    const response = await axios.post(url, {
+    axios.post(url, {
       email,
       password
-    }, options);
+    }, options)
+      .then(data => {
+        resp = data;
+        if (resp.data && resp.data.token) {
+          writeToken(resp.data.token);
+          const payload = getTokenData(resp.data.token);
+          console.log('token:', payload);
+        }
+        throw 'got-data';
+      })
+      .catch(err => {
+        if (err === 'got-data') {
+          console.log('got data 1', resp.data);
+          return;
+        }
+        throw new Error(err);
+      });
 
-    console.log(response.data);
-    console.log(response.headers);
-    if (response.data && response.data.token) {
-      await writeToken(response.data.token);
-      const payload = getTokenData(response.data.token);
-      console.log('token:', payload);
-    }
-
+    return resp.data;
   }
   catch (err) {
     console.log(err.toString());
@@ -146,20 +182,36 @@ const signin = async (email, password) => {
 };
 
 
-const getRequests = async () => {
+const getRequests = (params = {}) => {
   const url = `http://${domain}/api/requests`;
+  const options = loadOptions();
+  const axiosParams = buildAxiosParams(params);
+  options.params = axiosParams;
+  console.log(axiosParams);
+  let resp;
   try {
-    const resp = await axios.get(url, loadOptions());
-    return resp.data;
+    axios.get(url, options)
+      .then(data => {
+        resp = data;
+        throw 'got-data';
+      })
+      .catch(err => {
+        if (err === 'got-data') {
+          console.log('got data 1', resp.data);
+          return;
+        }
+        console.log(err.toString());
+      });
   }
   catch (err) {
-    console.log(err.toString());
+    if (err === 'got-data') {
+      return resp.data;
+    }
   }
   return [];
 }
 
-
-export const signout = (authType = 'cookie') => {
+const signout = (authType = 'cookie') => {
   // Just toss the cookie.
   const file = authType == 'cookie' ? 'cookies.txt' : 'token.txt';
   if (fs.existsSync('./' + file)) {
@@ -174,19 +226,22 @@ const dispatch = {
   help: () => {
     console.error('no help yet');
   },
-  test: async () => {
-    const rslt = await getTest();
+  test: () => {
+    const rslt = getTest();
     console.log('run test', rslt);
   },
-  requests: async () => {
-    const rslt = await getRequests();
+  requests: () => {
+    params = {
+      // coachId: 'c3'
+    };
+    const rslt = getRequests(params);
     console.log(rslt);
   },
-  signup: async (name, email, password) => {
+  signup: (name, email, password) => {
     name = name || 'yaya3';
     email = email || 'yaya3@yayas.org';
     password = password || 'yayayayaya';
-    const reply = await signupUser(name, email, password);
+    const reply = signupUser(name, email, password);
     console.log('signup returned:', reply);
   },
   signin: (email, password) => {

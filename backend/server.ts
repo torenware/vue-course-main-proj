@@ -44,6 +44,8 @@ const isAuthorized = (req: Request) => {
       token = match[1];
       // @ts-ignore
       credentials = validateToken(token);
+      // @ts-ignore
+      req.currentUser = credentials;
     }
   }
 
@@ -53,6 +55,9 @@ const isAuthorized = (req: Request) => {
     if (token === '' || typeof credentials !== 'object') {
       return false;
     } else {
+      // We want to restrict coach requests to the particular coach.
+      // @ts-ignore
+      req.query.coachId = credentials.id;
       return true;
     }
   }
