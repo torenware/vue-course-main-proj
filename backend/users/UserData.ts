@@ -34,7 +34,6 @@ export default class UserData {
    }
 
    getUsersByField(field: UserKeys, val: string): UserType[] {
-     console.log('for key', field, val);
      return this.data.filter(user => {
        return user[field] === val;
      });

@@ -25,7 +25,6 @@ export default class UserFile {
     if (!fh) {
       throw new Error('Could not open user file for write');
     }
-    console.log('about to write:', users);
     const content = JSON.stringify(users, null, 2);
     fs.writeSync(fh, content);
     fs.closeSync(fh);

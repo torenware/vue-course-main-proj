@@ -16,6 +16,8 @@ pnpm-debug.log*
 # Datafile used by json-server
 db.json
 users.json
+cookies.txt
+token.txt
 
 # Editor directories and files
 .idea

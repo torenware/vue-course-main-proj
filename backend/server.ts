@@ -3,6 +3,7 @@ import jsonServer from 'json-server';
 import { ErrorRequestHandler, NextFunction } from 'express';
 import cors from 'cors';
 import { authRouter } from './routes';
+import { validateToken } from './utils/Tokens';
 
 const server = jsonServer.create();
 const rundir = '.';
@@ -32,6 +33,42 @@ server.use((req: Request, res: Response, next) => {
   next();
 });
 
+const isAuthorized = (req: Request) => {
+  // @ts-ignore
+  const { authorization } = req.headers;
+  let token = '';
+  let credentials: string | object = '';
+  if (authorization) {
+    const match = (authorization as string).match(/^Bearer\s(\S+)/);
+    if (match) {
+      token = match[1];
+      // @ts-ignore
+      credentials = validateToken(token);
+    }
+  }
+
+  // @todo may want to return the string since expiry is one
+  // thing we'd learn.
+  if (req.method === 'GET' && req.url === '/api/requests') {
+    if (token === '' || typeof credentials !== 'object') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return true;
+};
+
+// @ts-ignore
+server.use((req: Request, res: Response, next: NextFunction) => {
+  if (isAuthorized(req)) {
+    next(); // continue to JSON Server router
+  } else {
+    // @ts-ignore
+    res.status(401).send('Authorization Required');
+  }
+});
+
 server.use('/auth', authRouter);
 server.use('/api', router);
 
@@ -49,12 +86,11 @@ server.use(function(
     console.log('no err');
     next();
   } else {
-    console.log('full err', err);
     // @ts-ignore
     res.status(400).send(err.message);
   }
 });
 
 server.listen(3005, () => {
-  console.log('JSON Server is running');
+  console.log('JSON Server is running at :3005');
 });
