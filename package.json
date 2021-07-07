@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "api-alt": "node --loader ts-node/esm backend/server.ts",
     "api": "cd backend; ts-node-dev server.ts",
     "dev": "yarn serve && yarn api",
     "build": "vue-cli-service build",
