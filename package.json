@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "api": "cd backend; ts-node-dev server.ts",
-    "dev": "yarn serve && yarn api",
+    "dev": "concurrently 'yarn serve' 'yarn api'",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -44,6 +44,7 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-typescript": "^7.0.0",
     "babel-eslint": "^10.1.0",
+    "concurrently": "^6.2.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
     "typescript": "~4.1.5"

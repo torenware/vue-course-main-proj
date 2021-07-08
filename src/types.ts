@@ -12,6 +12,12 @@ export interface RequestAttribs {
   message: string;
 }
 
+export interface UserAttribs {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface Request extends RequestAttribs {
   id?: string;
   coachId: string;
@@ -19,4 +25,11 @@ export interface Request extends RequestAttribs {
 
 export interface Coach extends CoachAttribs {
   id: string;
+}
+
+export interface User {
+  name: string;
+  email: string;
+  id: string;
+  token: string;
 }

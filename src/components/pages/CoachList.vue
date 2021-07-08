@@ -84,7 +84,6 @@ export default defineComponent({
           return false;
         }
         const searchThis = fullName(coach).toUpperCase();
-        console.log(searchThis);
         return searchThis.includes(ucTerm);
       });
     });

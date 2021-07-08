@@ -5,6 +5,7 @@ import CoachDetails from '../components/pages/CoachDetails.vue';
 import Register from '../components/pages/Register.vue';
 import Contact from '../components/pages/Contact.vue';
 import RequestList from '../components/pages/RequestList.vue';
+import AuthForm from '../components/pages/auth/UserAuth.vue';
 import NotFound from '../components/pages/NotFound.vue';
 import store from '@/store';
 
@@ -12,6 +13,16 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/coaches'
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: AuthForm
+  },
+  {
+    path: '/signin',
+    name: 'signin',
+    component: AuthForm
   },
   {
     path: '/coaches',

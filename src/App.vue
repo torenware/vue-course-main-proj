@@ -30,8 +30,10 @@ export default defineComponent({
     const router = useRouter();
 
     try {
+      store.dispatch('loadLocalData');
       store.dispatch('loadStore', loaded);
-      store.dispatch('requests/loadRequests', loadedRequests);
+      // requests will now load on demand if the user has access.
+      // store.dispatch('requests/loadRequests', loadedRequests);
     }
     catch (err) {
       // Regretably not much to do here.  Not even the router

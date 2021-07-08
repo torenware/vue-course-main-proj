@@ -5,6 +5,7 @@ import type { Coach } from '@/types';
 import fetcher from './fetcher';
 import flashStore from './flash';
 import requestStore from './requests';
+import authStore from './auth';
 
 interface CoachList {
   coaches: Coach[];
@@ -28,7 +29,9 @@ const store = createStore({
     // @ts-ignore
     flash: flashStore,
     // @ts-ignore
-    requests: requestStore
+    requests: requestStore,
+    // @ts-ignore
+    auth: authStore
   },
   // @ts-ignore
   state () {
