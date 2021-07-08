@@ -27,7 +27,7 @@
         </base-form-control>
         <base-form-control>
           <template #default="slotProps">
-          <input type="number"
+          <input type="number" step="0.01"
                  placeholder="Hourly Rate (US $)"
                  required
                 @invalid="slotProps.notify('invalid')"
