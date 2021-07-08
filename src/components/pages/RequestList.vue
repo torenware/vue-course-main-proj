@@ -21,6 +21,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const loaded = inject('loadedRequests', ref(false));
+    store.dispatch('requests/loadRequests', loaded);
 
     const requests = computed(() => {
       return store.getters['requests/allRequests'];

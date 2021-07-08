@@ -97,13 +97,17 @@ const store = createStore({
 
      async addCoach(context, newCoach) {
        // @ts-ignore
-       const id = Date.now().toFixed(0).toString(16);
+       const id = context.getters.loginStatus;
+       if (!id || id === '') {
+         throw new Error('Must be logged in to register as a coach');
+       }
        const rawCoach = {
         ...newCoach,
         id
        };
        try {
-         const coach = await fetcher<Coach>('api/coaches', 'POST', rawCoach);
+         const token = context.rootGetters.jwtToken;
+         const coach = await fetcher<Coach>('api/coaches', 'POST', token, rawCoach);
          context.commit('addCoach', coach);
        }
        catch(err) {

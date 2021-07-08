@@ -47,6 +47,8 @@ const isAuthorized = (req: Request) => {
       // @ts-ignore
       req.currentUser = credentials;
     }
+  } else {
+    console.log('no auth info');
   }
 
   // @todo may want to return the string since expiry is one
@@ -59,6 +61,10 @@ const isAuthorized = (req: Request) => {
       // @ts-ignore
       req.query.coachId = credentials.id;
       return true;
+    }
+  } else if (req.method === 'POST' && req.url === '/api/coaches') {
+    if (token === '' || typeof credentials !== 'object') {
+      return false;
     }
   }
   return true;

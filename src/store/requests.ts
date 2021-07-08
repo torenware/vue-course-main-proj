@@ -66,8 +66,9 @@ const store: StoreOptions<RequestStore> = {
 
     async loadRequests(context, loaded: Ref<boolean>) {
       try {
+        const token = context.rootGetters.jwtToken;
         loaded.value = false;
-        const requests = await fetcher<Request[]>('api/requests', 'GET');
+        const requests = await fetcher<Request[]>('api/requests', 'GET', token);
         context.commit('loadRequests', requests);
         loaded.value = true;
       } catch (err) {

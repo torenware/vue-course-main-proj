@@ -183,7 +183,7 @@ export default defineComponent({
         lastName: lastName.value,
         description: description.value,
         hourlyRate: parseFloat(hourlyRate.value!),
-        areas: areas.value
+        areas: areas.value,
       };
       try {
         store.dispatch('addCoach', payload);

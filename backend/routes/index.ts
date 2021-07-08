@@ -30,6 +30,7 @@ export const validateRequest = (
 ) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log('validate:', errors);
     //throw new Error('validation failed');
     next(errors);
   }

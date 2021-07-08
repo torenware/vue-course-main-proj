@@ -81,6 +81,7 @@ export default defineComponent({
       console.log('submitted');
 
       if (isLoginForm.value) {
+        console.log('on login path');
         const payload = {
           email: email.value,
           password: password.value
@@ -97,13 +98,16 @@ export default defineComponent({
 
       }
       else {
+        console.log('on signup path');
         const payload: UserAttribs = {
           name: name.value,
           password: password.value,
           email: email.value
-        }
+        };
+        console.log('payload', payload);
 
         try {
+          console.log('payload from form', payload);
           store.dispatch('signup', payload);
           router.push('/');
           store.dispatch('setFlash', 'Thank you for signing up!');
