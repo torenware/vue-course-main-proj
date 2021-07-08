@@ -7,13 +7,11 @@ export function validateToken(token: string) {
     return false;
   }
   const payload = jwt.verify(token, secret);
-  console.log(payload);
   return payload;
 }
 
 export function getTokenData(token: string) {
   const payload = jwt.decode(token);
-  console.log(payload);
   return payload;
 }
 

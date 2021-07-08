@@ -17,7 +17,6 @@ const useFormHooks = () => {
       console.log('form ref not up');
       return;
     }
-    console.log('clearing form...');
     const controls = formRef.value.querySelectorAll('input,select,textarea');
     controls.forEach(item => {
       // @ts-ignore

@@ -11,16 +11,12 @@ export default class UserFile {
   createIfNotExisting() {
     const path = this.path;
     const cwd = process.cwd();
-    console.log('cinx ran');
-    console.log('path', path);
-    console.log('current dir', cwd);
     if (!fs.existsSync(this.path)) {
       this.writeData([]);
     }
   }
 
   writeData(users: UserType[]) {
-    console.log('entering write');
     const fh = fs.openSync(this.path, 'w');
     if (!fh) {
       throw new Error('Could not open user file for write');
@@ -36,6 +32,3 @@ export default class UserFile {
     return users;
   }
 }
-
-// const uf = new UserFile('./test.json');
-// uf.createIfNotExisting();

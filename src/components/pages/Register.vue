@@ -152,7 +152,6 @@ export default defineComponent({
         console.log('regform ref not up');
         return;
       }
-      console.log('clearing form...');
       const controls = regForm.value.querySelectorAll('input,select,textarea');
       controls.forEach(item => {
         // @ts-ignore

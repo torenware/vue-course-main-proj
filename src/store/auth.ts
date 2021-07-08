@@ -52,7 +52,6 @@ const store: StoreOptions<AuthStore> = {
   },
   mutations: {
     setLogin(state, userId: string) {
-      console.log('login set to', userId);
       state.loggedIn = userId;
     },
     setToken(state, token: string | null) {
@@ -61,7 +60,6 @@ const store: StoreOptions<AuthStore> = {
   },
   getters: {
     loginStatus(state) {
-      console.log('LIS in store:', state.loggedIn);
       return state.loggedIn;
     },
     jwtToken(state) {
@@ -82,7 +80,6 @@ const store: StoreOptions<AuthStore> = {
     async signup(context, userData: UserAttribs) {
       try {
         const payload: UserAttribs = userData;
-        console.log('payload in action', payload);
         // @ts-ignore
         const user = await fetcher<User>('auth/signup', 'POST', null, payload);
         context.commit('setLogin', user.id);

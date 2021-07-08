@@ -11,8 +11,6 @@ export default async function fetcher<T>(
     payload = JSON.stringify(body);
   }
 
-  console.log('token in fetcher', token);
-
   const options: RequestInit = {
     method,
     headers: {

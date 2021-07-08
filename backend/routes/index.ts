@@ -7,12 +7,9 @@ import Password from '../utils/Password';
 import { UserType } from '../types';
 
 function loaderFunc() {
-  console.log('enter store loader');
   const uf = new UserFile(process.cwd() + '/users.json');
   uf.createIfNotExisting();
-  console.log('start loading data');
   const store = UserData.loadFromFile(uf);
-  console.log('store loaded');
   return store;
 }
 
@@ -31,7 +28,6 @@ export const validateRequest = (
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log('validate:', errors);
-    //throw new Error('validation failed');
     next(errors);
   }
   next();
@@ -56,7 +52,6 @@ signup.post(
   ],
   validateRequest,
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('post hander called');
     const { email, password, name, role } = req.body;
     const store = loaderFunc();
     const withEmail = store.getUsersByField('email', email);
@@ -67,10 +62,7 @@ signup.post(
       const err = new Error('Duplicate email');
       res.status(400).send(err.message);
       return;
-    } else {
-      console.log(withEmail);
     }
-    console.log('passed dupe check');
 
     const userData = {
       name,
@@ -89,11 +81,6 @@ signup.post(
     // @ts-ignore
     const userJwt = signToken(user.id!, user.email, user.role!, '2d');
     const authPayload = validateToken(userJwt);
-
-    // And put it on as a cookie
-    // req.session = {
-    //   jwt: userJwt,
-    // };
 
     // Payload imitates Google's behavior.
     // In particular: expires is a "delta".

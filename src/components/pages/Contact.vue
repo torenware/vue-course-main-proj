@@ -77,7 +77,6 @@ export default defineComponent({
     });
 
     const submitContact = () => {
-      console.log('submit called');
       const newRequest = {
         coachId: idParam.value,
         title: subject.value,
