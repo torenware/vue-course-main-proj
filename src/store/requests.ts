@@ -55,6 +55,7 @@ const store: StoreOptions<RequestStore> = {
         const request = await fetcher<Request>(
           'api/requests',
           'POST',
+          false, // no token yet
           newRequest
         );
         context.commit('addRequest', request);

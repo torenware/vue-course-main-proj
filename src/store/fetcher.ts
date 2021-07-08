@@ -1,6 +1,7 @@
 export default async function fetcher<T>(
   res: string,
   method: string,
+  token: string | false = false,
   body = {}
 ): Promise<T> {
   const base = '/';
@@ -16,6 +17,12 @@ export default async function fetcher<T>(
       'Content-Type': 'application/json'
     }
   };
+
+  if (token) {
+    // @ts-ignore
+    options.headers['Authorized'] = `Bearer ${token}`;
+  }
+
   if (payload) {
     options.body = payload;
   }
