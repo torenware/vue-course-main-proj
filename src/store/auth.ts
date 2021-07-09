@@ -7,6 +7,7 @@ interface AuthStore {
   token: string | null;
   name: string;
   email: string;
+  expires: number | null;
 }
 
 interface UserAttribs {
@@ -20,13 +21,15 @@ interface User {
   email: string;
   id: string;
   token: string;
+  expires: number | null;
 }
 
 // Params in localStorage
 interface LocalParams {
-  [index: string]: string;
+  [index: string]: string | number;
   userId: string;
   token: string;
+  expires: number;
 }
 
 // Keys for localStorage.
@@ -36,6 +39,7 @@ function getLocalKeys() {
 
 function saveLocalData(params: LocalParams) {
   Object.keys(params).forEach(key => {
+    // @ts-ignore
     localStorage.setItem(key, params[key]);
   });
 }
@@ -54,7 +58,8 @@ const store: StoreOptions<AuthStore> = {
       loggedIn: '',
       token: null,
       name: '',
-      email: ''
+      email: '',
+      expires: null
     };
   },
   mutations: {
@@ -64,17 +69,22 @@ const store: StoreOptions<AuthStore> = {
     setToken(state, token: string | null) {
       state.token = token;
     },
+    setExpiration(state, expires: number | null) {
+      state.expires = expires;
+    },
     setUser(state, user: User | null) {
       if (user) {
         state.loggedIn = user.id;
         state.token = user.token;
         state.email = user.email;
         state.name = user.name;
+        state.expires = user.expires;
       } else {
         state.loggedIn = '';
         state.token = null;
         state.email = '';
         state.name = '';
+        state.expires = null;
       }
     }
   },
@@ -90,7 +100,8 @@ const store: StoreOptions<AuthStore> = {
         id: state.loggedIn,
         token: state.token,
         email: state.email,
-        name: state.name
+        name: state.name,
+        expires: state.expires
       };
     }
   },
@@ -112,7 +123,8 @@ const store: StoreOptions<AuthStore> = {
         context.commit('setUser', user);
         saveLocalData({
           userId: user.id,
-          token: user.token
+          token: user.token,
+          expires: user.expires || 0
         });
         router.push('/');
         window.scroll(0, 0);
@@ -133,10 +145,12 @@ const store: StoreOptions<AuthStore> = {
           false,
           userData
         );
+        console.log(user);
         context.commit('setUser', user);
         saveLocalData({
           userId: user.id,
-          token: user.token
+          token: user.token,
+          expires: user.expires || 0
         });
         // if a coach, load their data.
         context.dispatch('setCurrentCoach');

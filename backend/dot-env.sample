@@ -1,2 +1,11 @@
-# Copy this file and name it .env.local. Change the password, dudes.
+#
+# Sample .env.local file to use with the modified server.
+#
+
+# Used by the jasonwebtoken code.
+JWT_KEY=change-the-password-dudes-ok
+
+# Token TTL. Two minutes for easy testing.
+# See https://github.com/vercel/ms for config info.
+TOKEN_TTL=2m
 

@@ -16,7 +16,7 @@
           <div>
             <base-button
                :link="true"
-               v-if="!currentCoach"
+               v-if="!currentCoach && loggedIn"
                to="/register">
               Become a Coach
             </base-button>
