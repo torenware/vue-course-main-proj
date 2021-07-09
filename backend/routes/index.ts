@@ -5,6 +5,7 @@ import UserData from '../users/UserData';
 import { signToken, validateToken } from '../utils/Tokens';
 import Password from '../utils/Password';
 import { UserType } from '../types';
+import { CustomError } from '../utils/Errors';
 
 function loaderFunc() {
   const uf = new UserFile(process.cwd() + '/users.json');
@@ -16,7 +17,7 @@ function loaderFunc() {
 const authRouter = express.Router();
 
 authRouter.use(function(req: Request, res: Response, next: NextFunction) {
-  console.log('my middleware called');
+  console.log(`Processing ${req.method} ${req.url}`);
   next();
 });
 
@@ -58,10 +59,7 @@ signup.post(
 
     if (withEmail.length > 0) {
       // Don't sign up a user twice.
-      //throw new Error('Email already in use');
-      const err = new Error('Duplicate email');
-      res.status(400).send(err.message);
-      return;
+      throw new CustomError('Duplicate email', 400);
     }
 
     const userData = {
@@ -119,7 +117,7 @@ signup.post(
       withEmail.length === 0 ||
       !Password.compare((withEmail[0] as UserType).password, password)
     ) {
-      const err = new Error('Invalid credentials');
+      const err = new CustomError('Invalid credentials', 400);
       next(err);
       return;
     }
@@ -127,11 +125,9 @@ signup.post(
     const { name, id, role } = user;
 
     // @see https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
-    const userJwt = signToken(user.id!, user.email, user.role!, '2d');
+    const userJwt = signToken(user.id!, user.email, user.role!, '2m');
     const authPayload = validateToken(userJwt);
 
-    // Payload imitates Google's behavior.
-    // In particular: expires is a "delta".
     const payload = {
       name,
       email,
@@ -139,7 +135,7 @@ signup.post(
       role,
       token: userJwt,
       // @ts-ignore
-      expires: authPayload.exp - authPayload.iat
+      expires: authPayload.exp
     };
 
     res.status(200).send(payload);

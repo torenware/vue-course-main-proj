@@ -1,7 +1,8 @@
 import { StoreOptions } from 'vuex';
-import { Ref } from 'vue';
 import fetcher from './fetcher';
-
+import FetchError from '@/utils/FetchError';
+import router from '@/routes';
+import { LS_UNSET, LS_LOADING, LS_LOADED } from '@/types';
 interface Request {
   id?: string;
   coachId: string;
@@ -64,16 +65,39 @@ const store: StoreOptions<RequestStore> = {
       }
     },
 
-    async loadRequests(context, loaded: Ref<boolean>) {
+    async loadRequests(context) {
       try {
         const token = context.rootGetters.jwtToken;
-        loaded.value = false;
+        context.commit('setRequestsLoaded', LS_LOADING, { root: true });
         const requests = await fetcher<Request[]>('api/requests', 'GET', token);
+        context.commit('setRequestsLoaded', LS_LOADED, { root: true });
         context.commit('loadRequests', requests);
-        loaded.value = true;
       } catch (err) {
-        throw new Error(err);
+        if (err instanceof FetchError) {
+          if (err.statusCode === 401) {
+            context.dispatch('logout', null, { root: true });
+            context.dispatch(
+              'setFlash',
+              {
+                msg: 'Your session has expired. Please Log In again.',
+                msgType: 'error'
+              },
+              { root: true }
+            );
+            router.push('/signin');
+          }
+        }
+
+        context.dispatch(
+          'setFlash',
+          {
+            msg: 'Sorry! We had a problem getting your requests',
+            msgType: 'error'
+          },
+          { root: true }
+        );
       }
+      context.commit('setRequestsLoaded', LS_UNSET, { root: true });
     }
   }
 };

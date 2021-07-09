@@ -87,11 +87,10 @@ export default defineComponent({
 
         try {
           store.dispatch('login', payload);
-          router.push('/');
-          store.dispatch('setFlash', 'Welcome back!!');
         }
         catch(err) {
           // no op; but do a flash here.
+          console.error('caught');
         }
 
       }

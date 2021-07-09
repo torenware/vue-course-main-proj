@@ -2,13 +2,22 @@ import { InjectionKey } from 'vue';
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 
 import type { Coach } from '@/types';
+// import  { LoadingState } from '@/types';
 import fetcher from './fetcher';
 import flashStore from './flash';
 import requestStore from './requests';
 import authStore from './auth';
 
+enum LoadingState {
+  unset = 0,
+  loading = 1,
+  loaded = 2
+}
+
 interface CoachList {
   coaches: Coach[];
+  coachesLoaded: LoadingState;
+  requestsLoaded: LoadingState;
 }
 
 export const key: InjectionKey<Store<CoachList>> = Symbol()
@@ -24,7 +33,7 @@ async function loadData(): Promise<Coach[]> {
 }
 
 // Create a new store instance.
-const store = createStore({
+const store = createStore<CoachList>({
   modules: {
     // @ts-ignore
     flash: flashStore,
@@ -36,7 +45,9 @@ const store = createStore({
   // @ts-ignore
   state () {
     return {
-      coaches: []
+      coaches: [],
+      coachesLoaded: LoadingState.unset,
+      requestsLoaded: LoadingState.unset
     };
   },
   mutations: {
@@ -47,14 +58,24 @@ const store = createStore({
     addCoach(state, coach: Coach) {
       // @ts-ignore
       state.coaches.push(coach);
+    },
+    setCoachesLoaded(state, loaded: LoadingState) {
+      state.coachesLoaded = loaded;
+    },
+    setRequestsLoaded(state, loaded: LoadingState) {
+      state.requestsLoaded = loaded;
     }
   },
   getters: {
-    // @ts-ignore
+    coachesLoaded(state) {
+      return state.coachesLoaded;
+    },
+    requestsLoaded(state) {
+      return state.requestsLoaded;
+    },
     coaches(state: CoachList): Coach[] {
       return state.coaches;
     },
-    // @ts-ignore
     coachById(state: CoachList) {
       return (id: string): Coach | null => {
         if (!state.coaches) {
@@ -89,6 +110,12 @@ const store = createStore({
     }
    },
    actions: {
+     setCoachesLoaded(context, loaded: LoadingState) {
+       context.commit('setCoachesLoaded', loaded);
+     },
+     setReqestsLoaded(context, loaded: LoadingState) {
+       context.commit('setRequestsLoaded', loaded);
+     },
      async loadStore(context, loaded) {
        const coaches = await loadData();
        context.commit('initStore', coaches);

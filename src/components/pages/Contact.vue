@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, inject } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Coach } from '@/types';
 import { useStore } from '@/store';
@@ -63,8 +63,6 @@ export default defineComponent({
     const subject = ref('');
     const email = ref('');
     const message = ref('');
-
-    const initializeFlash = inject<Function>('initializeFlash');
 
     const idParam = computed(() => {
       const {params} = useRoute();
@@ -91,7 +89,6 @@ export default defineComponent({
         store.dispatch('setFlash', 'Sorry! We had a problem saving your message. Please try later.');
       }
       window.scrollTo(0, 0);
-      initializeFlash!();
     }
 
     return {

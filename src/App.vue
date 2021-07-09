@@ -8,7 +8,7 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, provide,  onMounted, onUpdated  } from 'vue';
+import { defineComponent, ref, provide, computed, watch, onMounted  } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
@@ -24,7 +24,7 @@ export default defineComponent({
     provide('loaded', loaded);
     provide('loadedRequests', loadedRequests);
     provide('fubar', fubar);
-    const displayFlash = ref(false);
+    // const displayFlash = ref(false);
 
     const store = useStore();
     const router = useRouter();
@@ -42,29 +42,24 @@ export default defineComponent({
       fubar.value = true;
     }
 
-    function initializeFlash() {
-      const hasFlash = store.getters.hasFlash;
-      if (hasFlash) {
-        displayFlash.value = true;
+    const displayFlash = computed(() => {
+      return store.getters.hasFlash;
+    });
+
+    watch(displayFlash, (now: boolean) => {
+      if (now) {
         setTimeout(() => {
           store.dispatch('setFlash', '');
-          displayFlash.value = false;
         }, 10 * 1000);
       }
-    }
-    provide('initializeFlash', initializeFlash);
+    })
+
 
     onMounted(() => {
       if (fubar.value) {
         store.dispatch('setFlash', 'Sorry! The database failed to load for us!');
         router.push('/404');
       }
-
-      initializeFlash();
-    });
-
-    onUpdated(() => {
-      initializeFlash();
     });
 
     return {

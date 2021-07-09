@@ -1,5 +1,6 @@
 import { StoreOptions } from 'vuex';
 import fetcher from './fetcher';
+import router from '../routes';
 
 interface AuthStore {
   loggedIn: string;
@@ -80,29 +81,48 @@ const store: StoreOptions<AuthStore> = {
     async signup(context, userData: UserAttribs) {
       try {
         const payload: UserAttribs = userData;
-        // @ts-ignore
-        const user = await fetcher<User>('auth/signup', 'POST', null, payload);
+        const user = await fetcher<User>('auth/signup', 'POST', false, payload);
         context.commit('setLogin', user.id);
         context.commit('setToken', user.token);
         saveLocalData({
           userId: user.id,
           token: user.token
         });
+        router.push('/');
+        context.dispatch('setFlash', { msg: 'Thank you for signing up.' });
       } catch (err) {
-        throw new Error(err);
+        context.dispatch('setFlash', {
+          msg: 'Problem creating your account.',
+          msgType: 'error'
+        });
       }
     },
-    login(context, _: { email: string; password: string }) {
-      // temp: just wing it
-      const id = Date.now().toString(16);
-      context.commit('setLogin', id);
-      saveLocalData({
-        userId: id,
-        token: ''
-      });
+    async login(context, userData: { email: string; password: string }) {
+      try {
+        const user = await fetcher<User>(
+          'auth/signin',
+          'POST',
+          false,
+          userData
+        );
+        context.commit('setLogin', user.id);
+        context.commit('setToken', user.token);
+        saveLocalData({
+          userId: user.id,
+          token: user.token
+        });
+        router.push('/');
+        context.dispatch('setFlash', 'Welcome back!');
+      } catch (err) {
+        context.dispatch('setFlash', {
+          msg: 'There was a problem logging you in.',
+          msgType: 'error'
+        });
+      }
     },
     logout(context) {
       context.commit('setLogin', '');
+      context.commit('setToken', '');
       clearLocalData();
     }
   }

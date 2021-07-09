@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <base-card :cardType="flassClass">
     {{ flash }}
   </base-card>
 </template>
@@ -17,9 +17,15 @@ export default defineComponent({
       return flash;
     });
 
+    const flassClass = computed(() => {
+      const currClass = store.getters.currentMsgType;
+      return currClass;
+    });
+
 
     return {
-      flash
+      flash,
+      flassClass
     };
   },
 })

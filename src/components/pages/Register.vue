@@ -28,6 +28,7 @@
         <base-form-control>
           <template #default="slotProps">
           <input type="number" step="0.01"
+                 ref="rate"
                  placeholder="Hourly Rate (US $)"
                  required
                 @invalid="slotProps.notify('invalid')"
@@ -79,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, Ref } from 'vue';
+import { defineComponent, ref, Ref } from 'vue';
 
 // useStore has been overloaded.
 import { useStore } from '@/store';
@@ -91,13 +92,13 @@ export default defineComponent({
     const firstName = ref('');
     const lastName = ref('');
     const hourlyRate = ref(null);
+    const rate = ref(null); // ref to DOM.
     const description = ref('');
 
     const areaCGroup = ref(null);
     const regForm: Ref<HTMLFormElement> | Ref<null> = ref(null);
 
     const store = useStore();
-    const initializeFlash = inject<Function>('initializeFlash');
 
     function hasInvalidControl(evt: Event): boolean {
       if (evt.type === 'submit') {
@@ -193,7 +194,6 @@ export default defineComponent({
         store.dispatch('setFlash', 'We were not able to connect to the database. Please try again later');
       }
       window.scroll(0,0);
-      initializeFlash!();
     };
 
     return {
@@ -204,11 +204,11 @@ export default defineComponent({
       firstName,
       lastName,
       hourlyRate,
+      rate,
       description,
       checkBoxChanged,
       submitInfo,
       clearForm,
-      initializeFlash
     };
 
   },

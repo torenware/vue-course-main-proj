@@ -1,3 +1,7 @@
+export const LS_UNSET = 0;
+export const LS_LOADING = 1;
+export const LS_LOADED = 2;
+
 export interface CoachAttribs {
   firstName: string;
   lastName: string;
@@ -32,4 +36,11 @@ export interface User {
   email: string;
   id: string;
   token: string;
+}
+
+// won't export, blast it.
+export enum LoadingState {
+  unset = 0,
+  loading = 1,
+  loaded = 2
 }

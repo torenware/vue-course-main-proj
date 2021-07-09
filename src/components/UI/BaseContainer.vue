@@ -4,10 +4,10 @@
   </section>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 section {
   margin: 2rem;
-  border: 1px solid #797979;
+ // border: 1px solid #797979;
   padding: 1rem;
   flex: 1;
 }
