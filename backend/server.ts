@@ -1,11 +1,17 @@
 // server.js
 import jsonServer from 'json-server';
+import { NextFunction } from 'express';
 import 'express-async-errors';
-import { ErrorRequestHandler, NextFunction } from 'express';
 import cors from 'cors';
 import { authRouter } from './routes';
-import { validateToken, getTokenData } from './utils/Tokens';
-import { CustomError } from './utils/Errors';
+import { CustomError, errorHandler } from './utils/Errors';
+import { isAuthorized } from './auth';
+
+type ExpressMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void;
 
 const server = jsonServer.create();
 const rundir = '.';
@@ -13,7 +19,6 @@ const router = jsonServer.router(rundir + '/db.json');
 
 // App related items.
 import dotenv from 'dotenv';
-import { JwtPayload } from 'jsonwebtoken';
 dotenv.config({
   path: rundir + '/.env.local'
 });
@@ -23,13 +28,19 @@ const middlewares = jsonServer.defaults({
   logger: true
 });
 
+// Use json-server's middleware for both mounted
+// servers. cors() here is set up with minimal settings.
+// I wish I knew how to do this more precisely, but
+// since I have these servers proxied, I have CORS
+// superpowers.
+
 server.use(middlewares);
 server.use(cors());
 server.use(jsonServer.bodyParser);
 
 // Add creation time info
 // @ts-ignore
-server.use((req: Request, res: Response, next) => {
+server.use((req: Request, _res: Response, next) => {
   if (req.method === 'POST') {
     // @ts-ignore
     req.body.createdAt = Date.now();
@@ -37,56 +48,14 @@ server.use((req: Request, res: Response, next) => {
   next();
 });
 
-const isAuthorized = (req: Request) => {
-  // @ts-ignore
-  const { authorization } = req.headers;
-  let token = '';
-  let credentials: string | object = '';
-  let data: JwtPayload | null | string = null;
-  if (authorization) {
-    const match = (authorization as string).match(/^Bearer\s(\S+)/);
-    if (match) {
-      token = match[1];
-      data = getTokenData(token);
-      console.log(data);
-      try {
-        // @ts-ignore
-        credentials = validateToken(token);
-        console.log('credentials', credentials);
-        // @ts-ignore
-        req.currentUser = credentials;
-      } catch (err) {
-        console.log('message', err.message);
-        console.log('throw custom');
-        throw new CustomError('Session expired', 401);
-      }
-    }
-  } else {
-    console.log('no auth info');
-  }
-
-  // @todo may want to return the string since expiry is one
-  // thing we'd learn.
-  if (req.method === 'GET' && req.url === '/api/requests') {
-    if (token === '' || typeof credentials !== 'object') {
-      if (token) {
-        const message = credentials.toString();
-        throw new CustomError(message, 401);
-      }
-      return false;
-    } else {
-      // We want to restrict coach requests to the particular coach.
-      // @ts-ignore
-      req.query.coachId = credentials.id;
-      return true;
-    }
-  } else if (req.method === 'POST' && req.url === '/api/coaches') {
-    if (token === '' || typeof credentials !== 'object') {
-      return false;
-    }
-  }
-  return true;
-};
+//
+// Since json-server runs as a sub-component, there's no direct way
+// to inject authorization into those routes. The next handler is how
+// to do it indirectly. isAuthorized finds the URLs that require
+// authorization, pulls down the JWT token data from the headers, and
+// returns false if the token is not present over the required routes.
+// So we are already 401'd even before json-server gets to see the URLs.
+//
 
 // @ts-ignore
 server.use((req: Request, res: Response, next: NextFunction) => {
@@ -112,35 +81,7 @@ server.all('*', async (req, res, next) => {
 // @see https://expressjs.com/en/guide/error-haandling.html
 
 // @ts-ignore
-server.use(function(
-  err: ErrorRequestHandler,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  console.log('entering error handler');
-  if (!err) {
-    console.log('no err');
-    next();
-  } else {
-    let message: string;
-    let status = 400;
-
-    if (err instanceof CustomError) {
-      message = err.message;
-      status = err.statusCode;
-    }
-    // @ts-ignore
-    else if (err.message) {
-      // @ts-ignore
-      message = err.message;
-    } else {
-      message = err.toString();
-    }
-    // @ts-ignore
-    res.status(status).send({ error: message });
-  }
-});
+server.use(errorHandler);
 
 server.listen(3005, () => {
   console.log('JSON Server is running at :3005');
