@@ -119,15 +119,12 @@ const store = createStore<CoachList>({
       }
     },
     userFullName(state, getters) {
-      console.log('in UFN getter');
       const user = getters.user;
       if (user.id) {
         const coach = getters.currentCoach;
         if (coach) {
-          console.log('UFN Coach');
           return getters.fullName(user.id);
         } else {
-          console.log('UFN no coach');
           return user.name;
         }
       }
@@ -200,7 +197,6 @@ const store = createStore<CoachList>({
              context.commit('setCurrentCoach', null);
            }
            else {
-             console.log('current user is coach');
              context.commit('setCurrentCoach', coach);
            }
          }

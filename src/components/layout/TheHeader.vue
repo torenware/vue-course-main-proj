@@ -58,7 +58,6 @@ export default defineComponent({
 
     const userName = computed(() => {
       const fullName = store.getters.userFullName;
-      console.log('fullName', fullName);
       return fullName;
     });
 
