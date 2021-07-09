@@ -16,7 +16,7 @@
           <div>
             <base-button
                :link="true"
-               v-if="loggedIn"
+               v-if="!currentCoach"
                to="/register">
               Become a Coach
             </base-button>
@@ -96,6 +96,10 @@ export default defineComponent({
       return store.getters.loginStatus;
     });
 
+    const currentCoach = computed(() => {
+      return store.getters.currentCoach;
+    });
+
 
 
     return {
@@ -105,7 +109,8 @@ export default defineComponent({
       updateAreas,
       selectedAreas,
       loaded,
-      loggedIn
+      loggedIn,
+      currentCoach
     };
   },
 })

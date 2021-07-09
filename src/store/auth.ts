@@ -5,6 +5,8 @@ import router from '../routes';
 interface AuthStore {
   loggedIn: string;
   token: string | null;
+  name: string;
+  email: string;
 }
 
 interface UserAttribs {
@@ -20,12 +22,14 @@ interface User {
   token: string;
 }
 
+// Params in localStorage
 interface LocalParams {
   [index: string]: string;
   userId: string;
   token: string;
 }
 
+// Keys for localStorage.
 function getLocalKeys() {
   return ['userId', 'token'];
 }
@@ -48,7 +52,9 @@ const store: StoreOptions<AuthStore> = {
     return {
       // A user ID or blacnk
       loggedIn: '',
-      token: null
+      token: null,
+      name: '',
+      email: ''
     };
   },
   mutations: {
@@ -57,6 +63,19 @@ const store: StoreOptions<AuthStore> = {
     },
     setToken(state, token: string | null) {
       state.token = token;
+    },
+    setUser(state, user: User | null) {
+      if (user) {
+        state.loggedIn = user.id;
+        state.token = user.token;
+        state.email = user.email;
+        state.name = user.name;
+      } else {
+        state.loggedIn = '';
+        state.token = null;
+        state.email = '';
+        state.name = '';
+      }
     }
   },
   getters: {
@@ -65,6 +84,14 @@ const store: StoreOptions<AuthStore> = {
     },
     jwtToken(state) {
       return state.token;
+    },
+    user(state) {
+      return {
+        id: state.loggedIn,
+        token: state.token,
+        email: state.email,
+        name: state.name
+      };
     }
   },
   actions: {
@@ -82,8 +109,7 @@ const store: StoreOptions<AuthStore> = {
       try {
         const payload: UserAttribs = userData;
         const user = await fetcher<User>('auth/signup', 'POST', false, payload);
-        context.commit('setLogin', user.id);
-        context.commit('setToken', user.token);
+        context.commit('setUser', user);
         saveLocalData({
           userId: user.id,
           token: user.token
@@ -107,8 +133,7 @@ const store: StoreOptions<AuthStore> = {
           false,
           userData
         );
-        context.commit('setLogin', user.id);
-        context.commit('setToken', user.token);
+        context.commit('setUser', user);
         saveLocalData({
           userId: user.id,
           token: user.token
@@ -127,8 +152,7 @@ const store: StoreOptions<AuthStore> = {
       }
     },
     logout(context) {
-      context.commit('setLogin', '');
-      context.commit('setToken', '');
+      context.commit('setUser', null);
       context.commit('setCurrentCoach', null);
       clearLocalData();
     }

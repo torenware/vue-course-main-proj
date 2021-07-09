@@ -61,7 +61,15 @@ const store: StoreOptions<RequestStore> = {
         );
         context.commit('addRequest', request);
       } catch (e) {
-        throw new Error(e);
+        context.dispatch(
+          'setFlash',
+          {
+            msg: 'Our server did not handle the request',
+            msgType: 'error'
+          },
+          { root: true }
+        );
+        window.scroll(0, 0);
       }
     },
 
@@ -85,6 +93,7 @@ const store: StoreOptions<RequestStore> = {
               { root: true }
             );
             router.push('/signin');
+            window.scroll(0, 0);
             return;
           }
         }

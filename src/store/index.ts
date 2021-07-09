@@ -84,6 +84,7 @@ const store = createStore<CoachList>({
     currentCoach(state) {
       return state.currentCoach;
     },
+    // Returns a function taking coachId
     coachById(state: CoachList) {
       return (id: string): Coach | null => {
         if (!state.coaches) {
@@ -102,6 +103,7 @@ const store = createStore<CoachList>({
         return null;
       }
     },
+    // Returns a function taking coachId
     fullName(state, getters) {
       return (id: string) => {
         let coach = null;
@@ -115,6 +117,21 @@ const store = createStore<CoachList>({
           throw new Error('db not yet up');
         }
       }
+    },
+    userFullName(state, getters) {
+      console.log('in UFN getter');
+      const user = getters.user;
+      if (user.id) {
+        const coach = getters.currentCoach;
+        if (coach) {
+          console.log('UFN Coach');
+          return getters.fullName(user.id);
+        } else {
+          console.log('UFN no coach');
+          return user.name;
+        }
+      }
+      return 'Guest';
     }
    },
    actions: {

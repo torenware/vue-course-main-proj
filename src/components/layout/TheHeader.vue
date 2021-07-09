@@ -2,10 +2,10 @@
   <header>
     <h1><router-link to="/">Coach Hotel</router-link></h1>
     <nav>
+      <div class="user-name">
+         Hello, {{ userName }}
+      </div>
       <ul>
-        <li class="state">
-          State: {{ isLoggedIn }}
-        </li>
         <li>
           <router-link to="/coaches">Pick A Coach</router-link>
         </li>
@@ -36,17 +36,14 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 
 export default defineComponent({
   setup() {
     const store = useStore();
-    const router = useRouter();
 
     function logout() {
       store.dispatch('logout');
-      router.push('/');
     }
 
     const isLoggedIn = computed(() => {
@@ -59,12 +56,19 @@ export default defineComponent({
       }
     });
 
+    const userName = computed(() => {
+      const fullName = store.getters.userFullName;
+      console.log('fullName', fullName);
+      return fullName;
+    });
+
     const isCoach = computed(() => {
       return store.getters.currentCoach;
     });
 
     return {
       isLoggedIn,
+      userName,
       logout,
       isCoach
     };
@@ -87,7 +91,7 @@ header button {
   background-color: #3d008d;
 }
 
-header a, header button {
+header a, header button, div.user-name {
   text-decoration: none;
   color: #f391e3;
   display: inline-block;
@@ -124,7 +128,7 @@ header nav {
   width: 90%;
   margin: auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 header ul {
