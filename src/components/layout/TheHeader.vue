@@ -10,6 +10,14 @@
           <router-link to="/coaches">Pick A Coach</router-link>
         </li>
         <li>
+          <router-link to="/requests" v-if="isCoach">
+            Browse Your Requests
+          </router-link>
+          <router-link to="/register" v-else-if="isLoggedIn && !isCoach">
+            Become a Coach
+          </router-link>
+        </li>
+        <li>
           <router-link to="/signin" v-if="!isLoggedIn">
             Log In
           </router-link>
@@ -20,15 +28,6 @@
           <button @click="logout" v-if="isLoggedIn">
             Log Out
           </button>
-        <li>
-          <router-link to="/requests" v-if="isCoach">
-            Browse Your Requests
-          </router-link>
-          <router-link to="/register" v-else-if="isLoggedIn && !isCoach">
-            Become a Coach
-          </router-link>
-
-        </li>
       </ul>
     </nav>
   </header>

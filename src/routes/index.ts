@@ -37,6 +37,7 @@ const routes: RouteRecordRaw[] = [
         // This will either succeed silently, or
         // throw.
         store.dispatch('validateCoach', cid);
+        console.log('validated coach');
         return true;
       } catch (err) {
         // Something catestrophically wrong...
@@ -69,7 +70,21 @@ const routes: RouteRecordRaw[] = [
 
   {
     path: '/requests',
-    component: RequestList
+    component: RequestList,
+    beforeEnter: to => {
+      try {
+        const userId = store.getters.loginStatus;
+        if (userId) {
+          store.dispatch('validateCoach', userId);
+        }
+        if (userId && store.getters.currentCoach) {
+          return true;
+        }
+      } catch (err) {
+        return '/coaches';
+      }
+      return '/coaches';
+    }
   },
   {
     path: '/404',

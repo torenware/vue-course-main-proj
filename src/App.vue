@@ -19,12 +19,11 @@ export default defineComponent({
   },
   setup() {
     const loaded = ref(false);
-    const loadedRequests = ref(false);
+    // const loadedRequests = ref(false);
     const fubar = ref(false);
     provide('loaded', loaded);
-    provide('loadedRequests', loadedRequests);
+    // provide('loadedRequests', loadedRequests);
     provide('fubar', fubar);
-    // const displayFlash = ref(false);
 
     const store = useStore();
     const router = useRouter();
@@ -33,11 +32,11 @@ export default defineComponent({
       store.dispatch('loadLocalData');
       store.dispatch('loadStore', loaded);
       if (store.getters.timeRemaining > 0) {
+        console.log('start clock');
+        store.dispatch('setCurrentCoach');
         // start the clock...
-        store.dispatch('setUpTime');
+        store.dispatch('setUpTimer');
       }
-      // requests will now load on demand if the user has access.
-      // store.dispatch('requests/loadRequests', loadedRequests);
     }
     catch (err) {
       // Regretably not much to do here.  Not even the router

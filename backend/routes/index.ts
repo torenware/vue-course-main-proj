@@ -14,6 +14,7 @@ function loaderFunc() {
   return store;
 }
 
+// Make sure the standard validators run.
 export const validateRequest = (
   req: Request,
   res: Response,
@@ -73,6 +74,7 @@ signup.get('/signup', async (req: Request, res: Response) => {
   res.status(200).send('hello from the beyond');
 });
 
+// Signup handler
 signup.post(
   '/signup',
   [
@@ -115,6 +117,7 @@ signup.post(
   }
 );
 
+// Login handler.
 signup.post(
   '/signin',
   [

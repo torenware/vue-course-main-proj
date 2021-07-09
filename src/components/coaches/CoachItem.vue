@@ -2,13 +2,13 @@
   <li>
     <h3>{{fullName}}</h3>
     <h4>${{hourlyRate.toFixed(2)}} / hour</h4>
+    <p v-if="displayDescription">{{description}}</p>
     <div>
       <base-badge v-for="area in areas" :key="area" :title="area" :type="area"/>
     </div>
-    <div class="actions">
+    <div class="actions" v-if="displayButtons">
       <base-button :link="true" :to="coachContactLink" mode="outline">Contact Coach</base-button>
       <base-button :link="true" :to="coachLink"  mode="outline">Coach Details</base-button>
-
     </div>
   </li>
 </template>
@@ -21,6 +21,16 @@ import BaseButton from '../UI/BaseButton.vue';
 export default defineComponent({
   components: { BaseButton },
   props: {
+    displayButtons: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    displayDescription: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     id: {
       type: String,
       required: true,
@@ -66,7 +76,6 @@ export default defineComponent({
       fullName,
       coachLink,
       coachContactLink,
-
     };
   },
 })
