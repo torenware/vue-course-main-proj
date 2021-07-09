@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loaded" >
-    Loading...
+    <base-spinner />
   </div>
   <div v-else>
   <section>

@@ -39,7 +39,7 @@
     No requests, dude. So sorry!
   </p>
 </base-card>
-<p v-else>Loading...</p>
+<p v-else><base-spinner /></p>
 </template>
 
 <script lang="ts">
