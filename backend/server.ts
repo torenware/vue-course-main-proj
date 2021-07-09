@@ -115,6 +115,7 @@ server.use(function(
   res: Response,
   next: NextFunction
 ) {
+  console.log('entering error handler');
   if (!err) {
     console.log('no err');
     next();

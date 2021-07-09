@@ -21,9 +21,13 @@
             Log Out
           </button>
         <li>
-          <router-link to="/requests" v-if="isLoggedIn">
+          <router-link to="/requests" v-if="isCoach">
             Browse Your Requests
           </router-link>
+          <router-link to="/register" v-else-if="isLoggedIn && !isCoach">
+            Become a Coach
+          </router-link>
+
         </li>
       </ul>
     </nav>
@@ -55,9 +59,14 @@ export default defineComponent({
       }
     });
 
+    const isCoach = computed(() => {
+      return store.getters.currentCoach;
+    });
+
     return {
       isLoggedIn,
-      logout
+      logout,
+      isCoach
     };
   },
 })

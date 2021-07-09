@@ -21,7 +21,6 @@ export default defineComponent({
       const obj = {
         [props.cardType]: true
       };
-      console.log('classes', obj);
       return obj;
     });
 

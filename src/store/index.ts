@@ -18,6 +18,7 @@ interface CoachList {
   coaches: Coach[];
   coachesLoaded: LoadingState;
   requestsLoaded: LoadingState;
+  currentCoach: Coach | null;
 }
 
 export const key: InjectionKey<Store<CoachList>> = Symbol()
@@ -47,7 +48,8 @@ const store = createStore<CoachList>({
     return {
       coaches: [],
       coachesLoaded: LoadingState.unset,
-      requestsLoaded: LoadingState.unset
+      requestsLoaded: LoadingState.unset,
+      currentCoach: null
     };
   },
   mutations: {
@@ -58,6 +60,9 @@ const store = createStore<CoachList>({
     addCoach(state, coach: Coach) {
       // @ts-ignore
       state.coaches.push(coach);
+    },
+    setCurrentCoach(state, coach: Coach | null) {
+      state.currentCoach = coach;
     },
     setCoachesLoaded(state, loaded: LoadingState) {
       state.coachesLoaded = loaded;
@@ -75,6 +80,9 @@ const store = createStore<CoachList>({
     },
     coaches(state: CoachList): Coach[] {
       return state.coaches;
+    },
+    currentCoach(state) {
+      return state.currentCoach;
     },
     coachById(state: CoachList) {
       return (id: string): Coach | null => {
@@ -124,21 +132,27 @@ const store = createStore<CoachList>({
 
      async addCoach(context, newCoach) {
        // @ts-ignore
-       const id = context.getters.loginStatus;
-       if (!id || id === '') {
-         throw new Error('Must be logged in to register as a coach');
-       }
-       const rawCoach = {
-        ...newCoach,
-        id
-       };
-       try {
+      const id = context.getters.loginStatus;
+        try {
+          if (!id || id === '') {
+            throw new Error('Must be logged in to register as a coach');
+          }
+          const rawCoach = {
+          ...newCoach,
+          id
+          };
          const token = context.rootGetters.jwtToken;
          const coach = await fetcher<Coach>('api/coaches', 'POST', token, rawCoach);
          context.commit('addCoach', coach);
+         context.dispatch('setCurrentCoach', null, {root: true});
        }
        catch(err) {
-         throw new Error(err);
+         context.dispatch('setFlash', {
+           msg: 'Sorry! There was a problem registering.',
+           msgType: 'error'
+         },
+         {root: true}
+         );
        }
      },
 
@@ -154,6 +168,27 @@ const store = createStore<CoachList>({
          coach = await fetcher<Coach>('api/coaches/' + coachId, 'GET');
          if (!coach) {
            throw new Error('Coach not found');
+         }
+       }
+     },
+     async setCurrentCoach(context) {
+       const userId = context.getters.loginStatus;
+       if (!userId) {
+         context.commit('setCurrentCoach', null);
+       }
+       else {
+         try {
+           const coach = await fetcher<Coach>('api/coaches/' + userId, 'GET');
+           if (!coach) {
+             context.commit('setCurrentCoach', null);
+           }
+           else {
+             console.log('current user is coach');
+             context.commit('setCurrentCoach', coach);
+           }
+         }
+         catch (err) {
+            console.log('threw looking for current coach');
          }
        }
      }

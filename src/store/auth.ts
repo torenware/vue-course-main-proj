@@ -89,12 +89,14 @@ const store: StoreOptions<AuthStore> = {
           token: user.token
         });
         router.push('/');
+        window.scroll(0, 0);
         context.dispatch('setFlash', { msg: 'Thank you for signing up.' });
       } catch (err) {
         context.dispatch('setFlash', {
           msg: 'Problem creating your account.',
           msgType: 'error'
         });
+        window.scroll(0, 0);
       }
     },
     async login(context, userData: { email: string; password: string }) {
@@ -111,18 +113,23 @@ const store: StoreOptions<AuthStore> = {
           userId: user.id,
           token: user.token
         });
+        // if a coach, load their data.
+        context.dispatch('setCurrentCoach');
         router.push('/');
+        window.scroll(0, 0);
         context.dispatch('setFlash', 'Welcome back!');
       } catch (err) {
         context.dispatch('setFlash', {
           msg: 'There was a problem logging you in.',
           msgType: 'error'
         });
+        window.scroll(0, 0);
       }
     },
     logout(context) {
       context.commit('setLogin', '');
       context.commit('setToken', '');
+      context.commit('setCurrentCoach', null);
       clearLocalData();
     }
   }

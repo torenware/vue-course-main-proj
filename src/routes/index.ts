@@ -52,7 +52,19 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/register',
-    component: Register
+    component: Register,
+    beforeEnter: to => {
+      try {
+        const userId = store.getters.loginStatus;
+        if (userId) {
+          return true;
+        }
+      } catch (err) {
+        // Something catestrophically wrong...
+        return '/404';
+      }
+      return false;
+    }
   },
 
   {

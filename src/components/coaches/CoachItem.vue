@@ -8,7 +8,7 @@
     <div class="actions">
       <base-button :link="true" :to="coachContactLink" mode="outline">Contact Coach</base-button>
       <base-button :link="true" :to="coachLink"  mode="outline">Coach Details</base-button>
-      
+
     </div>
   </li>
 </template>
@@ -65,7 +65,8 @@ export default defineComponent({
     return {
       fullName,
       coachLink,
-      coachContactLink
+      coachContactLink,
+
     };
   },
 })

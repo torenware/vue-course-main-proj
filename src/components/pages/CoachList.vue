@@ -14,7 +14,10 @@
             Refresh
           </base-button>
           <div>
-            <base-button :link="true" to="/register">
+            <base-button
+               :link="true"
+               v-if="loggedIn"
+               to="/register">
               Become a Coach
             </base-button>
           </div>
@@ -54,6 +57,8 @@ export default defineComponent({
   },
   setup() {
     const loaded = inject('loaded');
+    const store = useStore();
+
     const fullName = (coach: Coach) => {
       return `${coach.firstName} ${coach.lastName}`;
     };
@@ -70,7 +75,6 @@ export default defineComponent({
     }
 
     const coachList = computed(() => {
-      const store = useStore();
       const coaches = store.getters.coaches;
       const ucTerm = searchTerm.value.toUpperCase();
       return  coaches.filter((coach: Coach) => {
@@ -88,6 +92,11 @@ export default defineComponent({
       });
     });
 
+    const loggedIn = computed(() => {
+      return store.getters.loginStatus;
+    });
+
+
 
     return {
       coachList,
@@ -95,7 +104,8 @@ export default defineComponent({
       doSearch,
       updateAreas,
       selectedAreas,
-      loaded
+      loaded,
+      loggedIn
     };
   },
 })

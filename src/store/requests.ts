@@ -85,9 +85,10 @@ const store: StoreOptions<RequestStore> = {
               { root: true }
             );
             router.push('/signin');
+            return;
           }
         }
-
+        // For anybody else...
         context.dispatch(
           'setFlash',
           {
