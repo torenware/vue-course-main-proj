@@ -8,6 +8,8 @@ interface AuthStore {
   name: string;
   email: string;
   expires: number | null;
+  // ID of the expiry timer
+  timer: number | null;
 }
 
 interface UserAttribs {
@@ -34,7 +36,7 @@ interface LocalParams {
 
 // Keys for localStorage.
 function getLocalKeys() {
-  return ['userId', 'token'];
+  return ['userId', 'token', 'expires'];
 }
 
 function saveLocalData(params: LocalParams) {
@@ -59,7 +61,8 @@ const store: StoreOptions<AuthStore> = {
       token: null,
       name: '',
       email: '',
-      expires: null
+      expires: null,
+      timer: null
     };
   },
   mutations: {
@@ -69,8 +72,11 @@ const store: StoreOptions<AuthStore> = {
     setToken(state, token: string | null) {
       state.token = token;
     },
-    setExpiration(state, expires: number | null) {
+    setExpires(state, expires: number | null) {
       state.expires = expires;
+    },
+    setTimer(state, timerId: number | null) {
+      state.timer = timerId;
     },
     setUser(state, user: User | null) {
       if (user) {
@@ -95,6 +101,16 @@ const store: StoreOptions<AuthStore> = {
     jwtToken(state) {
       return state.token;
     },
+    timerId(state) {
+      return state.timer;
+    },
+    // TTL in seconds.
+    timeRemaining(state) {
+      if (state.expires === null) {
+        return -1;
+      }
+      return Math.round(state.expires - Date.now() / 1000);
+    },
     user(state) {
       return {
         id: state.loggedIn,
@@ -109,11 +125,31 @@ const store: StoreOptions<AuthStore> = {
     loadLocalData(context) {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
+      const expires = localStorage.getItem('expires');
       if (userId !== null) {
         context.commit('setLogin', userId);
       }
-      if (token != null) {
+      if (token !== null) {
         context.commit('setToken', token);
+      }
+      if (expires) {
+        context.commit('setExpires', expires);
+      }
+    },
+    setUpTimer(context) {
+      const timerId = setInterval(() => {
+        if (context.getters.timeRemaining <= 0) {
+          console.log('Logging out as time has expired');
+          context.dispatch('logout');
+        }
+      }, 2 * 60 * 1000);
+      context.commit('setTimer', timerId);
+    },
+    cleanUpTimer(context) {
+      const id = context.getters.timerId;
+      if (id) {
+        clearInterval(id);
+        context.commit('setTimer', null);
       }
     },
     async signup(context, userData: UserAttribs) {
@@ -126,6 +162,7 @@ const store: StoreOptions<AuthStore> = {
           token: user.token,
           expires: user.expires || 0
         });
+        context.dispatch('setUpTimer');
         router.push('/');
         window.scroll(0, 0);
         context.dispatch('setFlash', { msg: 'Thank you for signing up.' });
@@ -154,6 +191,7 @@ const store: StoreOptions<AuthStore> = {
         });
         // if a coach, load their data.
         context.dispatch('setCurrentCoach');
+        context.dispatch('setUpTimer');
         router.push('/');
         window.scroll(0, 0);
         context.dispatch('setFlash', 'Welcome back!');
@@ -168,6 +206,7 @@ const store: StoreOptions<AuthStore> = {
     logout(context) {
       context.commit('setUser', null);
       context.commit('setCurrentCoach', null);
+      context.dispatch('cleanUpTimer');
       clearLocalData();
     }
   }

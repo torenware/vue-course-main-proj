@@ -32,6 +32,10 @@ export default defineComponent({
     try {
       store.dispatch('loadLocalData');
       store.dispatch('loadStore', loaded);
+      if (store.getters.timeRemaining > 0) {
+        // start the clock...
+        store.dispatch('setUpTime');
+      }
       // requests will now load on demand if the user has access.
       // store.dispatch('requests/loadRequests', loadedRequests);
     }
