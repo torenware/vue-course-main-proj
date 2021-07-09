@@ -25,8 +25,9 @@ const middlewares = jsonServer.defaults({
 
 server.use(middlewares);
 server.use(cors());
-
 server.use(jsonServer.bodyParser);
+
+// Add creation time info
 // @ts-ignore
 server.use((req: Request, res: Response, next) => {
   if (req.method === 'POST') {
@@ -96,6 +97,7 @@ server.use((req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// Mount our sub-routers.
 server.use('/auth', authRouter);
 server.use('/api', router);
 
@@ -105,7 +107,8 @@ server.all('*', async (req, res, next) => {
   throw new CustomError('Not Found', 404);
 });
 
-// Last in the chain.
+// Error handler: Last in the chain.
+// Try and normalize any errors.
 // @see https://expressjs.com/en/guide/error-haandling.html
 
 // @ts-ignore

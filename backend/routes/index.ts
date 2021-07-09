@@ -14,13 +14,6 @@ function loaderFunc() {
   return store;
 }
 
-const authRouter = express.Router();
-
-authRouter.use(function(req: Request, res: Response, next: NextFunction) {
-  console.log(`Processing ${req.method} ${req.url}`);
-  next();
-});
-
 export const validateRequest = (
   req: Request,
   res: Response,
@@ -34,7 +27,47 @@ export const validateRequest = (
   next();
 };
 
+const buildPayload = (user: UserType) => {
+  // Make sure we're passing the optional members of UserType at this point:
+  if (!user.role || !user.id) {
+    console.log('misconfiguration problem with user object');
+    return null;
+  }
+  // @see https://github.com/vercel/ms for valid time constants.
+  const tokenTTL = process.env.TOKEN_TTL || '2d';
+
+  // @see https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
+  // @ts-ignore
+  const userJwt = signToken(user.id, user.email, user.role, tokenTTL);
+  const authPayload = validateToken(userJwt);
+
+  const payload = {
+    name: user.name,
+    email: user.email,
+    id: user.id,
+    role: user.role,
+    token: userJwt,
+    // @ts-ignore
+    expires: authPayload.exp
+  };
+
+  return payload;
+};
+
+// Sub-router for /auth URI.
 const signup = express.Router();
+
+// Wraps our sub-router
+const authRouter = express.Router();
+
+authRouter.use(function(req: Request, res: Response, next: NextFunction) {
+  console.log(`Processing ${req.method} ${req.url}`);
+  next();
+});
+
+//
+// Handlers
+//
 
 signup.get('/signup', async (req: Request, res: Response) => {
   res.status(200).send('hello from the beyond');
@@ -73,25 +106,11 @@ signup.post(
     try {
       user = await store.addUser(userData);
       store.writeToFile();
-    } catch (err) {}
+    } catch (err) {
+      throw new CustomError('Could not write user to store', 400);
+    }
 
-    // @see https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
-    // @ts-ignore
-    const userJwt = signToken(user.id!, user.email, user.role!, '2d');
-    const authPayload = validateToken(userJwt);
-
-    // Payload imitates Google's behavior.
-    // In particular: expires is a "delta".
-    const payload = {
-      name,
-      email,
-      id: user!.id,
-      role: userData.role,
-      token: userJwt,
-      // @ts-ignore
-      expires: authPayload.exp - authPayload.iat
-    };
-
+    const payload = buildPayload(user);
     res.status(201).send(payload);
   }
 );
@@ -122,26 +141,10 @@ signup.post(
       return;
     }
     const user = withEmail[0] as UserType;
-    const { name, id, role } = user;
-
-    // @see https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
-    const userJwt = signToken(user.id!, user.email, user.role!, '2m');
-    const authPayload = validateToken(userJwt);
-
-    const payload = {
-      name,
-      email,
-      id,
-      role,
-      token: userJwt,
-      // @ts-ignore
-      expires: authPayload.exp
-    };
-
+    const payload = buildPayload(user);
     res.status(200).send(payload);
   }
 );
 
 authRouter.use(signup);
-
 export { authRouter };
