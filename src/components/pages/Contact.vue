@@ -4,7 +4,7 @@
     </h3>
   <base-card>
 
-  <form @submit.prevent="submitContact" v-if="coach">
+  <form @submit.prevent="submitContact" ref="form" v-if="coach">
     <base-form-control>
       <template #default="slotProps">
         <input id="title"
@@ -56,6 +56,7 @@ import { defineComponent, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Coach } from '@/types';
 import { useStore } from '@/store';
+import useFormHooks from '@/hooks/UseFormHooks';
 
 export default defineComponent({
   setup() {
@@ -63,6 +64,9 @@ export default defineComponent({
     const subject = ref('');
     const email = ref('');
     const message = ref('');
+    const form = ref(null);
+
+    const { clearForm } = useFormHooks();
 
     const idParam = computed(() => {
       const {params} = useRoute();
@@ -74,7 +78,7 @@ export default defineComponent({
       return rslt;
     });
 
-    const submitContact = () => {
+    const submitContact = async () => {
       const newRequest = {
         coachId: idParam.value,
         title: subject.value,
@@ -82,8 +86,9 @@ export default defineComponent({
         message: message.value
       };
       try {
-        store.dispatch('requests/addRequest', newRequest);
-        store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
+        await store.dispatch('requests/addRequest', newRequest);
+        await store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
+        clearForm(form);
       }
       catch (err) {
         store.dispatch('setFlash', 'Sorry! We had a problem saving your message. Please try later.');
@@ -92,6 +97,7 @@ export default defineComponent({
     }
 
     return {
+      form,
       idParam,
       coach,
       subject,

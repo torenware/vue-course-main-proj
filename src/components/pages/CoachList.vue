@@ -4,13 +4,13 @@
     @update-search-term="doSearch"
   />
   <div v-if="!loaded">
-    Loading...
+    <base-spinner />
   </div>
   <base-card v-else>
     <section>
       <div class="controls">
         <div class='control-buttons'>
-          <base-button mode="outline">
+          <base-button @click="reloadCoaches" mode="outline">
             Refresh
           </base-button>
           <div>
@@ -56,7 +56,7 @@ export default defineComponent({
     CoachFinder
   },
   setup() {
-    const loaded = inject('loaded');
+    const loaded: Ref<boolean> | undefined = inject('loaded');
     const store = useStore();
 
     const fullName = (coach: Coach) => {
@@ -65,6 +65,14 @@ export default defineComponent({
 
     const searchTerm = ref('');
     const selectedAreas: Ref<string[]> = ref(areas);
+
+    async function reloadCoaches() {
+      if (!loaded) {
+        return;
+      }
+      loaded.value = false;
+      await store.dispatch('loadStore', loaded);
+    }
 
     function doSearch(term: string) {
       searchTerm.value = term;
@@ -108,6 +116,7 @@ export default defineComponent({
       doSearch,
       updateAreas,
       selectedAreas,
+      reloadCoaches,
       loaded,
       loggedIn,
       currentCoach

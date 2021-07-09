@@ -19,10 +19,8 @@ export default defineComponent({
   },
   setup() {
     const loaded = ref(false);
-    // const loadedRequests = ref(false);
     const fubar = ref(false);
     provide('loaded', loaded);
-    // provide('loadedRequests', loadedRequests);
     provide('fubar', fubar);
 
     const store = useStore();

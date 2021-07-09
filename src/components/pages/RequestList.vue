@@ -72,7 +72,22 @@ export default defineComponent({
       return store.getters.currentCoach;
     });
     const requests = computed(() => {
-      return store.getters['requests/allRequests'] as Request[];
+      const rawRequests =  store.getters['requests/allRequests'] as Request[];
+      const sortRoutine = (r1: Request, r2: Request) => {
+        // as it turns out, the IDs are generated from microseconds.
+        const r1_key = r1.id!;
+        const r2_key = r2.id!;
+        if (r1_key > r2_key) {
+          return -1;
+        }
+        else if (r1_key < r2_key) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      };
+      return rawRequests.sort(sortRoutine);
     });
 
     watch(coach, now => {
