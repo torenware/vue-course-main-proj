@@ -12,6 +12,7 @@ interface AuthStore {
   expires: number | null;
   // ID of the expiry timer
   timer: number | null;
+  countdownTimer: number | null;
   countingDown: boolean;
 }
 
@@ -66,6 +67,7 @@ const store: StoreOptions<AuthStore> = {
       email: '',
       expires: null,
       timer: null,
+      countdownTimer: null,
       countingDown: false
     };
   },
@@ -81,6 +83,9 @@ const store: StoreOptions<AuthStore> = {
     },
     setTimer(state, timerId: number | null) {
       state.timer = timerId;
+    },
+    setCountdownTimer(state, val: number | null) {
+      state.countdownTimer = val;
     },
     setCountingDown(state, val: boolean) {
       state.countingDown = val;
@@ -111,12 +116,36 @@ const store: StoreOptions<AuthStore> = {
     timerId(state) {
       return state.timer;
     },
+    countdownTimerId(state) {
+      return state.countdownTimer;
+    },
     // TTL in seconds.
     timeRemaining(state) {
       if (state.expires === null) {
         return -1;
       }
       return Math.round(state.expires - Date.now() / 1000);
+    },
+    // Higher order function to create an updatable countdown string.
+    countdownString(state, getters) {
+      if (!theCountDown.value) {
+        return '';
+      }
+      const secsToGo = theCountDown.value;
+      const minutes = Math.floor(secsToGo / 60);
+      const secs = secsToGo - minutes * 60;
+
+      const zeroPadSecs = (secs: number) => {
+        // assuming we have an int under 61...
+        const rslt = secs.toString();
+        return rslt.length === 1 ? '0' + rslt : rslt;
+      };
+
+      if (minutes > 0) {
+        return `${minutes}:${zeroPadSecs(secs)}`;
+      } else {
+        return `0:${zeroPadSecs(secs)}`;
+      }
     },
     countingDown(state) {
       return state.countingDown;
@@ -196,6 +225,7 @@ const store: StoreOptions<AuthStore> = {
         if (!context.getters.countingDown) {
           clearInterval(timer);
           ref.value = 0;
+          context.commit('setCountdownTimer', null);
           console.log('stopped from counting down');
           return;
         }
@@ -206,6 +236,32 @@ const store: StoreOptions<AuthStore> = {
           clearInterval(timer);
         }
       }, 1000);
+      context.commit('setCountdownTimer', timer);
+    },
+    stopCountdown(context) {
+      context.commit('setCountingDown', false);
+      console.log('countdown stopped via action');
+    },
+    // handle token renewal
+    async renew(context) {
+      console.log('send a renewal message to server here');
+      try {
+        const token = context.getters.jwtToken;
+        const user = await fetcher<User>('auth/renew', 'GET', token);
+        console.log('got back user:', user);
+        context.commit('setUser', user);
+        saveLocalData({
+          userId: user.id,
+          token: user.token,
+          expires: user.expires || 0
+        });
+        context.dispatch('stopCountdown');
+        window.scroll(0, 0);
+        context.dispatch('setFlash', 'Session renewed.');
+        console.log('extended session');
+      } catch (err) {
+        console.log('got back an error, not a user:', err.message);
+      }
     },
     async signup(context, userData: UserAttribs) {
       try {
@@ -262,6 +318,8 @@ const store: StoreOptions<AuthStore> = {
       context.commit('setUser', null);
       context.commit('setCurrentCoach', null);
       context.dispatch('cleanUpTimer');
+      context.dispatch('setFlash', 'Goodbye!');
+      window.scroll(0, 0);
       clearLocalData();
     }
   }

@@ -1,5 +1,6 @@
 <template>
   <the-header :counting-down="countingDown" />
+  <renew-session  @close="dialogCancelled" v-if="countingDown && !hasCancelled" />
   <base-container>
     <transition name="fade">
       <base-flash v-if="displayFlash" />
@@ -14,15 +15,18 @@ import { defineComponent, ref, provide, computed, watch, onMounted  } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
+import RenewSession from './components/widgets/RenewSession.vue';
 import notifier from '@/store/countDowner';
 
 export default defineComponent({
   components: {
     TheHeader,
+    RenewSession
   },
   setup() {
     const loaded = ref(false);
     const fubar = ref(false);
+    const cancelled = ref(false);
     provide('loaded', loaded);
     provide('fubar', fubar);
 
@@ -31,12 +35,25 @@ export default defineComponent({
       return store.getters.countingDown;
     });
 
+    const isIdle = computed(() => {
+      return store.getters.isIdle;
+    });
+
+    const hasCancelled = computed(() => {
+      return cancelled.value;
+    });
+
+    function dialogCancelled() {
+      cancelled.value = true;
+    }
+
     const store = useStore();
     const router = useRouter();
 
     try {
       store.dispatch('loadLocalData');
       store.dispatch('loadStore', loaded);
+      store.dispatch('monitorIdle');
       if (store.getters.timeRemaining > 0) {
         console.log('start clock');
         store.dispatch('setCurrentCoach');
@@ -61,7 +78,13 @@ export default defineComponent({
           store.dispatch('setFlash', '');
         }, 6 * 1000);
       }
-    })
+    });
+
+    watch(countingDown, now => {
+      if (!now) {
+        cancelled.value = false;
+      }
+    });
 
 
     onMounted(() => {
@@ -73,7 +96,10 @@ export default defineComponent({
 
     return {
       displayFlash,
-      countingDown
+      countingDown,
+      isIdle,
+      hasCancelled,
+      dialogCancelled
     }
   }
 })

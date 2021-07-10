@@ -39,9 +39,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, Ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useStore } from '@/store';
-import countDowner from '@/store/countDowner';
 
 export default defineComponent({
   props: ['countingDown'],
@@ -62,29 +61,12 @@ export default defineComponent({
       }
     });
 
-    const remaining: Ref<number> = countDowner;
-
     const timeRemaining = computed(() => {
-      const secsToGo = remaining.value;
-      const minutes = Math.floor(secsToGo / 60);
-      const secs = secsToGo - minutes * 60;
-
-      if (secsToGo === 0) {
+      const uiString = store.getters.countdownString;
+      if (uiString === '') {
         return '';
       }
-
-      const zeroPadSecs = (secs: number) => {
-        // assuming we have an int under 61...
-        const rslt = secs.toString();
-        return rslt.length === 1 ? '0' + rslt : rslt;
-      }
-
-      if (minutes > 0 ) {
-        return `Logging out in ${minutes}:${zeroPadSecs(secs)}`;
-      }
-      else {
-        return `Logging out in 0:${zeroPadSecs(secs)}`;
-      }
+      return `Logging out in ${uiString}`;
     });
 
     const userName = computed(() => {

@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import UserFile from '../users/UserFile';
 import UserData from '../users/UserData';
 import { signToken, validateToken } from '../utils/tokens';
+import { validateTokenAuth, getUserTypeFromCredentials } from '../auth';
 import Password from '../utils/password';
 import { UserType } from '../types';
 import { CustomError } from '../utils/errors';
@@ -31,15 +32,20 @@ export const validateRequest = (
 const buildPayload = (user: UserType) => {
   // Make sure we're passing the optional members of UserType at this point:
   if (!user.role || !user.id) {
-    console.log('misconfiguration problem with user object');
-    return null;
+    throw new CustomError('misconfiguration problem with user object', 400);
   }
   // @see https://github.com/vercel/ms for valid time constants.
   const tokenTTL = process.env.TOKEN_TTL || '2d';
 
   // @see https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
   // @ts-ignore
-  const userJwt = signToken(user.id, user.email, user.role, tokenTTL);
+  const userJwt = signToken(
+    user.id,
+    user.email,
+    user.name,
+    user.role,
+    tokenTTL
+  );
   const authPayload = validateToken(userJwt);
 
   const payload = {
@@ -73,6 +79,23 @@ authRouter.use(function(req: Request, res: Response, next: NextFunction) {
 signup.get('/signup', async (req: Request, res: Response) => {
   res.status(200).send('hello from the beyond');
 });
+
+// Token renewal handler
+signup.get(
+  '/renew',
+  // @ts-ignore
+  validateTokenAuth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    // @todo: define currentUser on req for typescript
+    // @ts-ignore
+    const credentials = req.currentUser;
+    const user = getUserTypeFromCredentials(credentials);
+    // Rebuild the token and return.
+    const payload = buildPayload(user);
+    console.log('payload from renew', payload);
+    res.status(200).send(payload);
+  }
+);
 
 // Signup handler
 signup.post(

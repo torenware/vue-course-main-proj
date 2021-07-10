@@ -7,6 +7,7 @@ import fetcher from './fetcher';
 import flashStore from './flash';
 import requestStore from './requests';
 import authStore from './auth';
+import idleStore from './idle';
 
 enum LoadingState {
   unset = 0,
@@ -41,7 +42,9 @@ const store = createStore<CoachList>({
     // @ts-ignore
     requests: requestStore,
     // @ts-ignore
-    auth: authStore
+    auth: authStore,
+    // @ts-ignore
+    idle: idleStore
   },
   // @ts-ignore
   state () {

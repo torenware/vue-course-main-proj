@@ -1,5 +1,9 @@
 import FetchError from '@/utils/FetchError';
 
+interface NormalizedError {
+  error: string;
+}
+
 export default async function fetcher<T>(
   res: string,
   method: string,
@@ -31,10 +35,11 @@ export default async function fetcher<T>(
   const rslt = await fetch(url, options);
   if (![200, 201].includes(rslt.status)) {
     console.log('orig status', rslt.statusText);
-    const errInfo = await rslt.json();
+    const errInfo: NormalizedError = await rslt.json();
     const statusText = errInfo.error || rslt.statusText;
-    console.log(`Fetch: ${rslt.status} ${statusText}`);
+    // console.log(`Fetch: ${rslt.status} ${statusText}`);
+    // console.log('fetch error:', rslt.status, rslt.statusText);
     throw new FetchError(statusText, rslt.status);
   }
-  return rslt.json().then(data => data);
+  return await rslt.json();
 }

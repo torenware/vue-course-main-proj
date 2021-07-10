@@ -53,7 +53,7 @@ import areas from '@/utils/areas';
 export default defineComponent({
   components: {
     CoachItem,
-    CoachFinder
+    CoachFinder,
   },
   setup() {
     const loaded: Ref<boolean> | undefined = inject('loaded');
@@ -119,7 +119,7 @@ export default defineComponent({
       reloadCoaches,
       loaded,
       loggedIn,
-      currentCoach
+      currentCoach,
     };
   },
 })

@@ -19,6 +19,7 @@ export function getTokenData(token: string) {
 export function signToken(
   id: string,
   email: string,
+  name: string,
   role: string,
   expiresIn: number | string = '1d'
 ) {
@@ -28,6 +29,7 @@ export function signToken(
     {
       id,
       email,
+      name,
       role,
       exp
     },
