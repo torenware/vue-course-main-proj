@@ -149,18 +149,34 @@ const store: StoreOptions<AuthStore> = {
     // Force logout and manage a count-down widget.
     setUpTimer(context, notifier: Ref<number>) {
       console.log('start timer');
+      const clearTimer = () => {
+        console.log('Logging out as time has expired');
+        context.commit('setCountingDown', false);
+        context.dispatch('logout');
+      };
+
+      const startCountdown = (notifier: Ref<number>) => {
+        console.log('start the countdown');
+        context.commit('setCountingDown', true);
+        context.dispatch('setUpCountdown', notifier);
+      };
+      // Start the countdown as early as possible:
+      if (context.getters.timeRemaining <= 0) {
+        clearTimer();
+        return;
+      } else if (context.getters.timeRemaining < 2 * 60) {
+        console.log('start the countdown');
+        context.commit('setCountingDown', true);
+        context.dispatch('setUpCountdown', notifier);
+      }
       const timerId = setInterval(() => {
         if (context.getters.timeRemaining <= 0) {
-          console.log('Logging out as time has expired');
-          context.commit('setCountingDown', false);
-          context.dispatch('logout');
+          clearTimer();
         } else if (
           !context.getters.countingDown &&
           context.getters.timeRemaining < 4 * 60
         ) {
-          console.log('start the countdown');
-          context.commit('setCountingDown', true);
-          context.dispatch('setUpCountdown', notifier);
+          startCountdown(notifier);
         }
       }, 1 * 60 * 1000);
       context.commit('setTimer', timerId);

@@ -10,10 +10,17 @@ I'm using:
 
 * Typescript throughout.
 * Composition API
-* The original project keeps data up on Google Firebase. Rather than do that, I've integrated [json-server](https://github.com/typicode/json-server), a simple REST server based on ExpressJS. Any special server handling can be added pretty easily using regular Express middleware, although the out-of-the-box capabilities have been enough so far. The Vue dev-server knows how to proxy to it, which has saved my sanity from the evils of CORS.
+* The original project keeps data up on Google Firebase. Rather than do that, I've integrated [json-server](https://github.com/typicode/json-server), a simple REST server based on ExpressJS. Any special server handling can be added pretty easily using regular Express middleware, I've gotten JWT authentication working, and for dev purposes, it's a pretty good server. The Vue dev-server knows how to proxy to it, which has saved my sanity from the evils of CORS.
 * While most of the UI is designed by Max, I've coded the forms myself and done my own styling. Like Max in the course, it's in plain CSS w/o using a framework, although I am using SASS in places.
 * I did some experiments with client-side validation of the forms, and am using the [HTML 5 constraint validation API](https://developer.mozilla.org/en-US/docs/Web/API/Constraint_validation). I'm generally happy with the results, although some of the browser supplied stuff would be better done in regular JS.
 
-More will get added once I get to the authentication portion of the course.
+## Setup
 
+My packages.json file is set up with the [concurrently](https://www.npmjs.com/package/concurrently) program, which allows me to start up `yarn serve`, the standard Vue startup dev script, and `yarn api`, which starts up my modified json-server based server with the `yarn dev` command. Vue is configured in the `vue.config.js` file to proxy the API calls to the json-server router, and authentication APIs to my custom router code.
+
+Most of the objects are saved to db.json, which is the standard name used for json-server. User objects and data are saved to user.json. You should copy the `db-sample.json` starter file to `db.json`, since json-server needs the right structure to figure out what to server to you. `user.json` will get created automatically when you start using the software, since the schema is known w/o a starter file.
+
+You'll need to copy the `dot-env.sample` file to `.env.local`, and modify your JWT secret and the amount of time you want your tokens to live. The server will enforce this; an expired token will return a `401 Unauthorized` error.
+
+The server should behave a lot like Google Firebase, as far as I can tell. While I'd guess there are still bugs in there somewhere, the dev experience is pretty good, since the APIs seem to be stable, and the vuex code handles errors in the standard way.
 
