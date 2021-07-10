@@ -1,6 +1,8 @@
 import { StoreOptions } from 'vuex';
 import fetcher from './fetcher';
 import router from '../routes';
+import { ref, Ref } from 'vue';
+import theCountDown from './countDowner';
 
 interface AuthStore {
   loggedIn: string;
@@ -10,6 +12,7 @@ interface AuthStore {
   expires: number | null;
   // ID of the expiry timer
   timer: number | null;
+  countingDown: boolean;
 }
 
 interface UserAttribs {
@@ -62,7 +65,8 @@ const store: StoreOptions<AuthStore> = {
       name: '',
       email: '',
       expires: null,
-      timer: null
+      timer: null,
+      countingDown: false
     };
   },
   mutations: {
@@ -77,6 +81,9 @@ const store: StoreOptions<AuthStore> = {
     },
     setTimer(state, timerId: number | null) {
       state.timer = timerId;
+    },
+    setCountingDown(state, val: boolean) {
+      state.countingDown = val;
     },
     setUser(state, user: User | null) {
       if (user) {
@@ -111,6 +118,9 @@ const store: StoreOptions<AuthStore> = {
       }
       return Math.round(state.expires - Date.now() / 1000);
     },
+    countingDown(state) {
+      return state.countingDown;
+    },
     user(state) {
       return {
         id: state.loggedIn,
@@ -136,13 +146,23 @@ const store: StoreOptions<AuthStore> = {
         context.commit('setExpires', expires);
       }
     },
-    setUpTimer(context) {
+    // Force logout and manage a count-down widget.
+    setUpTimer(context, notifier: Ref<number>) {
+      console.log('start timer');
       const timerId = setInterval(() => {
         if (context.getters.timeRemaining <= 0) {
           console.log('Logging out as time has expired');
+          context.commit('setCountingDown', false);
           context.dispatch('logout');
+        } else if (
+          !context.getters.countingDown &&
+          context.getters.timeRemaining < 4 * 60
+        ) {
+          console.log('start the countdown');
+          context.commit('setCountingDown', true);
+          context.dispatch('setUpCountdown', notifier);
         }
-      }, 2 * 60 * 1000);
+      }, 1 * 60 * 1000);
       context.commit('setTimer', timerId);
     },
     cleanUpTimer(context) {
@@ -151,6 +171,25 @@ const store: StoreOptions<AuthStore> = {
         clearInterval(id);
         context.commit('setTimer', null);
       }
+    },
+    setUpCountdown(context, notifier: Ref<number>) {
+      console.log('countdown action starts');
+      const ref = notifier;
+      ref.value = context.getters.timeRemaining;
+      const timer = setInterval(() => {
+        if (!context.getters.countingDown) {
+          clearInterval(timer);
+          ref.value = 0;
+          console.log('stopped from counting down');
+          return;
+        }
+        ref.value = context.getters.timeRemaining;
+        if (ref.value <= 0) {
+          console.log('stopped from ref going to 0');
+          ref.value = 0;
+          clearInterval(timer);
+        }
+      }, 1000);
     },
     async signup(context, userData: UserAttribs) {
       try {
@@ -162,7 +201,7 @@ const store: StoreOptions<AuthStore> = {
           token: user.token,
           expires: user.expires || 0
         });
-        context.dispatch('setUpTimer');
+        context.dispatch('setUpTimer', theCountDown);
         router.push('/');
         window.scroll(0, 0);
         context.dispatch('setFlash', { msg: 'Thank you for signing up.' });
@@ -191,7 +230,7 @@ const store: StoreOptions<AuthStore> = {
         });
         // if a coach, load their data.
         context.dispatch('setCurrentCoach');
-        context.dispatch('setUpTimer');
+        context.dispatch('setUpTimer', theCountDown);
         router.push('/');
         window.scroll(0, 0);
         context.dispatch('setFlash', 'Welcome back!');

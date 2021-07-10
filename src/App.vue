@@ -1,5 +1,5 @@
 <template>
-  <the-header />
+  <the-header :counting-down="countingDown" />
   <base-container>
     <transition name="fade">
       <base-flash v-if="displayFlash" />
@@ -14,6 +14,7 @@ import { defineComponent, ref, provide, computed, watch, onMounted  } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
+import notifier from '@/store/countDowner';
 
 export default defineComponent({
   components: {
@@ -25,6 +26,11 @@ export default defineComponent({
     provide('loaded', loaded);
     provide('fubar', fubar);
 
+    // Final countdown to expiration:
+    const countingDown = computed(() => {
+      return store.getters.countingDown;
+    });
+
     const store = useStore();
     const router = useRouter();
 
@@ -35,7 +41,7 @@ export default defineComponent({
         console.log('start clock');
         store.dispatch('setCurrentCoach');
         // start the clock...
-        store.dispatch('setUpTimer');
+        store.dispatch('setUpTimer', notifier);
       }
     }
     catch (err) {
@@ -66,7 +72,8 @@ export default defineComponent({
     });
 
     return {
-      displayFlash
+      displayFlash,
+      countingDown
     }
   }
 })

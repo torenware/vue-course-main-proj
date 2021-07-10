@@ -3,7 +3,12 @@
     <h1><router-link to="/">Coach Hotel</router-link></h1>
     <nav>
       <div class="user-name">
-         Hello, {{ userName }}
+        <div>
+           Hello, {{ userName }}
+         </div>
+         <div class="expiring-in" v-if="countingDown">
+           {{ timeRemaining }}
+         </div>
       </div>
       <ul>
         <li>
@@ -34,10 +39,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, Ref } from 'vue';
 import { useStore } from '@/store';
+import countDowner from '@/store/countDowner';
 
 export default defineComponent({
+  props: ['countingDown'],
   setup() {
     const store = useStore();
 
@@ -55,6 +62,31 @@ export default defineComponent({
       }
     });
 
+    const remaining: Ref<number> = countDowner;
+
+    const timeRemaining = computed(() => {
+      const secsToGo = remaining.value;
+      const minutes = Math.floor(secsToGo / 60);
+      const secs = secsToGo - minutes * 60;
+
+      if (secsToGo === 0) {
+        return '';
+      }
+
+      const zeroPadSecs = (secs: number) => {
+        // assuming we have an int under 61...
+        const rslt = secs.toString();
+        return rslt.length === 1 ? '0' + rslt : rslt;
+      }
+
+      if (minutes > 0 ) {
+        return `Logging out in ${minutes}:${zeroPadSecs(secs)}`;
+      }
+      else {
+        return `Logging out in 0:${zeroPadSecs(secs)}`;
+      }
+    });
+
     const userName = computed(() => {
       const fullName = store.getters.userFullName;
       return fullName;
@@ -68,7 +100,8 @@ export default defineComponent({
       isLoggedIn,
       userName,
       logout,
-      isCoach
+      isCoach,
+      timeRemaining
     };
   },
 })
@@ -140,6 +173,10 @@ header ul {
 
 li {
   margin: 0 0.5rem;
+}
+
+.expiring-in {
+  font-size: smaller;
 }
 
 .state {

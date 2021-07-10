@@ -93,7 +93,7 @@ export default defineComponent({
     watch(coach, now => {
       if (!now) {
         store.dispatch('setFlash', {
-          msg: "Logged due to session expiring"
+          msg: "Session has expired."
         });
         router.push('/');
       }
