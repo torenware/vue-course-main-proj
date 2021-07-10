@@ -1,6 +1,8 @@
 <template>
   <base-card :cardType="flassClass">
+    <div class="container">
     {{ flash }}
+    </div>
   </base-card>
 </template>
 
@@ -22,7 +24,6 @@ export default defineComponent({
       return currClass;
     });
 
-
     return {
       flash,
       flassClass
@@ -30,3 +31,9 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.container {
+  text-align: center;
+}
+</style>

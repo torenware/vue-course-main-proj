@@ -1,7 +1,9 @@
 <template>
   <the-header />
   <base-container>
-    <base-flash v-if="displayFlash" />
+    <transition name="fade">
+      <base-flash v-if="displayFlash" />
+    </transition>
     <router-view></router-view>
   </base-container>
 </template>
@@ -51,7 +53,7 @@ export default defineComponent({
       if (now) {
         setTimeout(() => {
           store.dispatch('setFlash', '');
-        }, 10 * 1000);
+        }, 6 * 1000);
       }
     })
 
@@ -84,4 +86,15 @@ html {
 body {
   margin: 0;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 </style>
