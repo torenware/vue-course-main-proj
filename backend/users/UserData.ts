@@ -1,7 +1,7 @@
 import type { UserType } from '../types';
 import User from './User'
 import UserFile from './UserFile'
-import Password from '../utils/Password';
+import Password from '../utils/password';
 
 type UserKeys = keyof UserType;
 

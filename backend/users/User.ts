@@ -1,5 +1,5 @@
 import { UserType } from '../types';
-import Password from '../utils/Password';
+import Password from '../utils/password';
 
 export default class User {
   public userData: UserType;

@@ -4,7 +4,7 @@ import { NextFunction } from 'express';
 import 'express-async-errors';
 import cors from 'cors';
 import { authRouter } from './routes';
-import { CustomError, errorHandler } from './utils/Errors';
+import { CustomError, errorHandler } from './utils/errors';
 import { isAuthorized } from './auth';
 
 type ExpressMiddleware = (

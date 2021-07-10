@@ -2,10 +2,10 @@ import express, { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import UserFile from '../users/UserFile';
 import UserData from '../users/UserData';
-import { signToken, validateToken } from '../utils/Tokens';
-import Password from '../utils/Password';
+import { signToken, validateToken } from '../utils/tokens';
+import Password from '../utils/password';
 import { UserType } from '../types';
-import { CustomError } from '../utils/Errors';
+import { CustomError } from '../utils/errors';
 
 function loaderFunc() {
   const uf = new UserFile(process.cwd() + '/users.json');

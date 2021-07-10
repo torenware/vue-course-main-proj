@@ -1,6 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
-import { CustomError } from '../utils/Errors';
-import { getTokenData, validateToken } from '../utils/Tokens';
+import { CustomError } from '../utils/errors';
+import { getTokenData, validateToken } from '../utils/tokens';
 
 export const isAuthorized = (req: Request) => {
   // @ts-ignore
