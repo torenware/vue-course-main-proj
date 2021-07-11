@@ -29,10 +29,10 @@
           <router-link to="/signup" v-if="!isLoggedIn">
             Sign Up
           </router-link>
-        </li>
           <button @click="logout" v-if="isLoggedIn">
             Log Out
           </button>
+        </li>
       </ul>
     </nav>
   </header>
@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 
 
-<style>
+<style lang="scss">
   header {
   width: 100%;
   height: 5rem;
@@ -155,13 +155,13 @@ header ul {
 
 li {
   margin: 0 0.5rem;
+  &:last-of-type {
+    margin-right: 2em;
+  }
 }
 
 .expiring-in {
   font-size: smaller;
 }
 
-.state {
-  color: white;
-}
 </style>

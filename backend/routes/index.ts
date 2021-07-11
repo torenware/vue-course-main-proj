@@ -5,7 +5,7 @@ import UserData from '../users/UserData';
 import { signToken, validateToken } from '../utils/tokens';
 import { validateTokenAuth, getUserTypeFromCredentials } from '../auth';
 import Password from '../utils/password';
-import { UserType } from '../types';
+import { SanitizedUser, UserType } from '../types';
 import { CustomError } from '../utils/errors';
 
 function loaderFunc() {
@@ -97,6 +97,23 @@ signup.get(
   }
 );
 
+signup.get(
+  '/current-user',
+  // @ts-ignore
+  validateTokenAuth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    // @todo: define currentUser on req for typescript
+    // @ts-ignore
+    const credentials = req.currentUser;
+    const user = getUserTypeFromCredentials(credentials);
+    const userData = user as SanitizedUser;
+    // @ts-ignore
+    delete userData['password'];
+    console.log('user', user);
+    res.status(200).send(user);
+  }
+);
+
 // Signup handler
 signup.post(
   '/signup',
@@ -160,7 +177,7 @@ signup.post(
 
     if (
       withEmail.length === 0 ||
-      !Password.compare((withEmail[0] as UserType).password, password)
+      !Password.compare((withEmail[0] as UserType).password!, password)
     ) {
       const err = new CustomError('Invalid credentials', 400);
       next(err);

@@ -2,7 +2,6 @@ import { InjectionKey } from 'vue';
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 
 import type { Coach } from '@/types';
-// import  { LoadingState } from '@/types';
 import fetcher from './fetcher';
 import flashStore from './flash';
 import requestStore from './requests';
@@ -178,12 +177,14 @@ const store = createStore<CoachList>({
      async validateCoach(context, coachId) {
        // First, see if we have a record.
        // @ts-ignore
-       let coach = context.state.coaches.find(ch => ch.id === coachId);
+       const coach = context.state.coaches.find(ch => ch.id === coachId);
        if (!coach) {
          // May be we just haven't loaded. So check the DB directly.
          // If we throw, the router will handle this.
-         coach = await fetcher<Coach>('api/coaches/' + coachId, 'GET');
-         if (!coach) {
+
+         // We use a trick to check for a coach w/o causing the fetcher to throw.
+         const coachArray = await fetcher<Coach[]>('api/coaches?id=' + coachId, 'GET');
+         if (!coachArray.length) {
            throw new Error('Coach not found');
          }
        }
@@ -195,12 +196,12 @@ const store = createStore<CoachList>({
        }
        else {
          try {
-           const coach = await fetcher<Coach>('api/coaches/' + userId, 'GET');
-           if (!coach) {
+           const coachArray = await fetcher<Coach[]>('api/coaches?id=' + userId, 'GET');
+           if (!coachArray.length) {
              context.commit('setCurrentCoach', null);
            }
            else {
-             context.commit('setCurrentCoach', coach);
+             context.commit('setCurrentCoach', coachArray[0]);
            }
          }
          catch (err) {

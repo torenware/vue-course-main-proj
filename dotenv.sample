@@ -1,0 +1,5 @@
+# Sample .env file for the app. Copy to .env; .env.local etc.
+# will not work for Vue 3, at least when I wrote this.
+
+# Format is vercel/ms
+VUE_APP_IDLE_TIMEOUT=10m

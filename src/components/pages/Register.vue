@@ -80,9 +80,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref } from 'vue';
-
-// useStore has been overloaded.
+import { defineComponent, ref, Ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -99,6 +98,7 @@ export default defineComponent({
     const regForm: Ref<HTMLFormElement> | Ref<null> = ref(null);
 
     const store = useStore();
+    const router = useRouter();
 
     function hasInvalidControl(evt: Event): boolean {
       if (evt.type === 'submit') {
@@ -110,6 +110,17 @@ export default defineComponent({
       }
       return false;
     }
+
+    const shouldBeAvailable = computed(() => {
+      const loggedIn = store.getters.loginStatus != '';
+      return loggedIn;
+    });
+
+    watch( shouldBeAvailable, now => {
+      if (!now) {
+        router.push('/');
+      }
+    });
 
     function validateAreaGroup() {
       if (!areaCGroup.value) {

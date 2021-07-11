@@ -1,7 +1,9 @@
-export interface UserType {
+export interface SanitizedUser {
   id?: string;
   name: string;
   email: string;
-  password: string;
   role?: string;
+}
+export interface UserType extends SanitizedUser {
+  password: string;
 }

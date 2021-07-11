@@ -72,6 +72,7 @@ const routes: RouteRecordRaw[] = [
     path: '/requests',
     component: RequestList,
     beforeEnter: to => {
+      console.log('BE router called');
       try {
         const userId = store.getters.loginStatus;
         if (userId) {
@@ -99,6 +100,11 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+router.beforeResolve(to => {
+  console.log('before resolve');
+  return true;
 });
 
 export default router;

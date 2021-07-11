@@ -36,8 +36,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, inject, ref, Ref } from 'vue'
-import { useRoute} from 'vue-router';
+import { defineComponent, computed, inject, ref, Ref, onBeforeMount } from 'vue'
+import { useRoute, useRouter} from 'vue-router';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -45,6 +45,8 @@ export default defineComponent({
     const loaded: Ref<boolean> = inject('loaded', ref(false));
     const route = useRoute();
     const store = useStore();
+    const router = useRouter();
+
     const contactLink = computed(() => {
       return `/coaches/${route.params.id}/contact`;
     });
@@ -55,6 +57,12 @@ export default defineComponent({
         return null;
       }
       return store.getters.coachById(id);
+    });
+
+    onBeforeMount(() => {
+      if (!coach.value) {
+        router.push('/');
+      }
     });
 
     const fullName = computed(() => {

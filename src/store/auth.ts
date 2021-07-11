@@ -1,7 +1,7 @@
 import { StoreOptions } from 'vuex';
 import fetcher from './fetcher';
 import router from '../routes';
-import { ref, Ref } from 'vue';
+import { Ref } from 'vue';
 import theCountDown from './countDowner';
 
 interface AuthStore {
@@ -170,6 +170,7 @@ const store: StoreOptions<AuthStore> = {
       }
       if (token !== null) {
         context.commit('setToken', token);
+        context.dispatch('user');
       }
       if (expires) {
         context.commit('setExpires', expires);
@@ -241,6 +242,13 @@ const store: StoreOptions<AuthStore> = {
     stopCountdown(context) {
       context.commit('setCountingDown', false);
       console.log('countdown stopped via action');
+    },
+    async user(context) {
+      const token = context.getters.jwtToken;
+      const user = await fetcher<User>('auth/current-user', 'GET', token);
+      console.log('got back user:', user);
+      user.token = token;
+      context.commit('setUser', user);
     },
     // handle token renewal
     async renew(context) {

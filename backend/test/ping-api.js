@@ -110,6 +110,33 @@ const getTest = () => {
   return resp && resp.data ? resp.data : '';
 }
 
+const currentUser = async () => {
+  const url = `http://${domain}/auth/current-user`;
+  let resp;
+  try {
+    axios.get(url, loadOptions())
+      .then(data => {
+        resp = data;
+        throw 'got-data';
+      })
+      .catch(err => {
+        if (err === 'got-data') {
+          console.log('got data 1', resp.data);
+          return;
+        }
+        throw new Error(err);
+      });
+
+    return resp.data;
+  }
+  catch (err) {
+    console.log(err.toString());
+    if (err.toJSON) {
+      console.log(err.toJSON());
+    }
+  }
+  return null;
+}
 
 const signupUser = async (name, email, password) => {
   const url = `http://${domain}/auth/signup`;
@@ -122,6 +149,7 @@ const signupUser = async (name, email, password) => {
   try {
     axios.post(url, data, loadOptions())
       .then(data => {
+        console.log('entered then');
         resp = data;
         if (resp.data && resp.data.token) {
           writeToken(resp.data.token);
@@ -159,6 +187,7 @@ const signin = (email, password) => {
     }, options)
       .then(data => {
         resp = data;
+        console.log(data);
         if (resp.data && resp.data.token) {
           writeToken(resp.data.token);
           const payload = getTokenData(resp.data.token);
@@ -168,7 +197,7 @@ const signin = (email, password) => {
       })
       .catch(err => {
         if (err === 'got-data') {
-          console.log('got data 1', resp.data);
+          console.log('got data 1', resp);
           return;
         }
         throw new Error(err);
@@ -230,6 +259,9 @@ const dispatch = {
     const rslt = getTest();
     console.log('run test', rslt);
   },
+  user: () => {
+    const rslt = currentUser();
+  },
   requests: () => {
     params = {
       // coachId: 'c3'
@@ -242,7 +274,11 @@ const dispatch = {
     email = email || 'yaya3@yayas.org';
     password = password || 'yayayayaya';
     const reply = signupUser(name, email, password);
-    console.log('signup returned:', reply);
+    let val;
+    reply.then(data => {
+      val = data;
+    });
+    console.log('signup returned:', val);
   },
   signin: (email, password) => {
     email = email || 'yaya3@yayas.org';

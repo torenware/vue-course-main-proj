@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, provide, computed, watch, onMounted  } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
 import RenewSession from './components/widgets/RenewSession.vue';
@@ -50,6 +50,7 @@ export default defineComponent({
 
     const store = useStore();
     const router = useRouter();
+    const route = useRoute();
 
     try {
       store.dispatch('loadLocalData');
@@ -60,6 +61,12 @@ export default defineComponent({
         store.dispatch('setCurrentCoach');
         // start the clock...
         store.dispatch('setUpTimer', notifier);
+      }
+      else {
+        // if we landed first at a guarded route,
+        // trigger the route guards.
+        const path = route.path;
+        router.replace(path);
       }
     }
     catch (err) {
