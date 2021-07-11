@@ -88,7 +88,7 @@ const store: StoreOptions<IdleStore> = {
       console.log('monitoring idleness');
       const instance = new IdleJS({
         onIdle() {
-          console.log('updating at', new Date());
+          console.log('Detecting idle state at', new Date());
           setUpTimer();
         },
         onActive() {
