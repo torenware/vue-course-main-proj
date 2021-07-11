@@ -224,6 +224,7 @@ export default defineComponent({
 .cgroup {
   display: flex;
   flex-direction: column;
+  padding-top: 0;
 }
 
 input, label {
