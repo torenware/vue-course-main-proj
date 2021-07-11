@@ -1,13 +1,15 @@
 <template>
-  <div class="form-control"
-       ref="formControl"
-       :class="invalidClass"
-       @invalid="handleInvalid"
-  >
-    <slot :notify="notifyFC"></slot>
-    <div class="error" v-if="getMessage && !controlValid">
-      {{ getMessage }}
+  <div class="control-wrapper">
+    <div class="form-control"
+        ref="formControl"
+        :class="invalidClass"
+        @invalid="handleInvalid"
+    >
+      <slot :notify="notifyFC"></slot>
     </div>
+      <div class="error" v-if="getMessage && !controlValid">
+        {{ getMessage }}
+      </div>
   </div>
 </template>
 
@@ -119,27 +121,30 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+  .control-wrapper {
+    margin-bottom: 1rem;
+  }
+
+  div.error {
+    margin-top: .5rem;
+    color: red;
+    opacity: .6;
+  }
+
+
   div.form-control {
     display: flex;
     flex-direction: row;
 
-    // &.control {
-    //   display: flex;
-    //   flex-direction: column;
-    // }
-
     input, textarea {
       flex: 1;
       margin: 0;
-    }
+   }
 
     &.invalid {
     input, label, textarea, select, div.error {
       color: red;
       border-color: lightcoral;
-    }
-    div.error {
-      padding-left: 10px;
     }
    }
   }
