@@ -60,7 +60,7 @@ function clearLocalData() {
 const store: StoreOptions<AuthStore> = {
   state() {
     return {
-      // A user ID or blacnk
+      // A user ID or blank
       loggedIn: '',
       token: null,
       name: '',

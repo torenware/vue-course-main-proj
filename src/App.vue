@@ -27,6 +27,7 @@ export default defineComponent({
     const loaded = ref(false);
     const fubar = ref(false);
     const cancelled = ref(false);
+    const idledOut = ref(false);
     provide('loaded', loaded);
     provide('fubar', fubar);
 
@@ -72,6 +73,10 @@ export default defineComponent({
       return store.getters.hasFlash;
     });
 
+    const loginState = computed(() => {
+      return store.getters.loginStatus;
+    });
+
     watch(displayFlash, (now: boolean) => {
       if (now) {
         setTimeout(() => {
@@ -86,6 +91,13 @@ export default defineComponent({
       }
     });
 
+    watch(loginState, now => {
+      console.log('loginState is', now);
+      if (now === '') {
+        // Just logged out
+        idledOut.value = false;
+      }
+    });
 
     onMounted(() => {
       if (fubar.value) {
