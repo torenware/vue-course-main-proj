@@ -1,5 +1,6 @@
 <template>
   <the-header :counting-down="countingDown" />
+  <about-to-idle-out  @close="dismissIdleOut" v-if="idleThreat && !countingDown"/>
   <renew-session  @close="dialogCancelled" v-if="countingDown && !hasCancelled" />
   <base-container>
     <transition name="fade">
@@ -11,33 +12,44 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, provide, computed, watch, onMounted  } from 'vue';
+import { defineComponent, ref, provide, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
 import RenewSession from './components/widgets/RenewSession.vue';
+import AboutToIdleOut from './components/widgets/AboutToIdleOutAlert.vue';
 import notifier from '@/store/countDowner';
 
 export default defineComponent({
   components: {
     TheHeader,
-    RenewSession
+    RenewSession,
+    AboutToIdleOut
   },
   setup() {
     const loaded = ref(false);
     const fubar = ref(false);
     const cancelled = ref(false);
     const idledOut = ref(false);
+    // Put up UI for about-to-idle-out:
+    const idleThreat = ref(false);
     provide('loaded', loaded);
     provide('fubar', fubar);
 
     // Final countdown to expiration:
     const countingDown = computed(() => {
-      return store.getters.countingDown;
+      return store.state.auth.countingDown;
     });
 
     const isIdle = computed(() => {
-      return store.getters.isIdle;
+      return store.state.idle.idle !== 0;
+    });
+
+    const almostIdledOut = computed(() => {
+      if (store.state.idle.idle === 0) {
+        return false;
+      }
+      return store.state.idle.aboutToExpire;
     });
 
     const hasCancelled = computed(() => {
@@ -81,7 +93,8 @@ export default defineComponent({
     });
 
     const loginState = computed(() => {
-      return store.getters.loginStatus;
+      const lis =  store.state.auth.loggedIn;
+      return lis;
     });
 
     watch(displayFlash, (now: boolean) => {
@@ -103,8 +116,22 @@ export default defineComponent({
       if (now === '') {
         // Just logged out
         idledOut.value = false;
+        idleThreat.value = false;
       }
     });
+
+    watch(almostIdledOut, now => {
+      if (now) {
+        if (loginState.value !== '') {
+          store.dispatch('setFlash', "30 second warning");
+          idleThreat.value = true;
+        }
+      }
+    });
+
+    function dismissIdleOut() {
+      idleThreat.value = false;
+    }
 
     onMounted(() => {
       if (fubar.value) {
@@ -118,7 +145,9 @@ export default defineComponent({
       countingDown,
       isIdle,
       hasCancelled,
-      dialogCancelled
+      dialogCancelled,
+      idleThreat,
+      dismissIdleOut
     }
   }
 })

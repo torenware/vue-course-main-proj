@@ -5,8 +5,8 @@ import type { Coach } from '@/types';
 import fetcher from './fetcher';
 import flashStore from './flash';
 import requestStore from './requests';
-import authStore from './auth';
-import idleStore from './idle';
+import authStore, { AuthStore} from './auth';
+import idleStore, { IdleStore } from './idle';
 
 enum LoadingState {
   unset = 0,
@@ -21,7 +21,13 @@ interface CoachList {
   currentCoach: Coach | null;
 }
 
-export const key: InjectionKey<Store<CoachList>> = Symbol()
+interface RootStore {
+  root: CoachList;
+  auth: AuthStore;
+  idle: IdleStore;
+}
+
+export const key: InjectionKey<Store<RootStore>> = Symbol()
 
 async function loadData(): Promise<Coach[]> {
   try {

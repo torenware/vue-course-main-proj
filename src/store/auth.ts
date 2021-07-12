@@ -4,7 +4,7 @@ import router from '../routes';
 import { Ref } from 'vue';
 import theCountDown from './countDowner';
 
-interface AuthStore {
+export interface AuthStore {
   loggedIn: string;
   token: string | null;
   name: string;
@@ -310,6 +310,7 @@ const store: StoreOptions<AuthStore> = {
         });
         // if a coach, load their data.
         context.dispatch('setCurrentCoach');
+        context.dispatch('resetIdleCounters');
         context.dispatch('setUpTimer', theCountDown);
         router.push('/');
         window.scroll(0, 0);
@@ -329,6 +330,7 @@ const store: StoreOptions<AuthStore> = {
       context.dispatch('setFlash', 'Goodbye!');
       window.scroll(0, 0);
       clearLocalData();
+      context.dispatch('resetIdleCounters');
     }
   }
 };

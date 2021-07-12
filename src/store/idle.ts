@@ -3,12 +3,14 @@ import IdleJS from 'idle-js';
 import ms from 'ms';
 import appDefaults from '@/utils/defaults';
 
-interface IdleStore {
+export interface IdleStore {
   // date number in micro seconds.
   // 0 for not idle.
   idle: number;
   expires: number;
+  aboutToExpire: boolean;
   idleTimer: number | null;
+  idleJs: IdleJS | null;
 }
 
 const store: StoreOptions<IdleStore> = {
@@ -16,10 +18,15 @@ const store: StoreOptions<IdleStore> = {
     return {
       idle: 0,
       idleTimer: null,
-      expires: 0
+      expires: 0,
+      aboutToExpire: false,
+      idleJs: null
     };
   },
   mutations: {
+    setIdleJSInstance(state, instance: IdleJS) {
+      state.idleJs = instance;
+    },
     setIdle(state, idle: number) {
       state.idle = idle;
       if (state.idle === 0) {
@@ -32,6 +39,9 @@ const store: StoreOptions<IdleStore> = {
     },
     setIdleTimer(state, tid: number | null) {
       state.idleTimer = tid;
+    },
+    setAboutToExpire(state, value: boolean) {
+      state.aboutToExpire = value;
     }
   },
   getters: {
@@ -61,16 +71,27 @@ const store: StoreOptions<IdleStore> = {
     // This needs to get called to start idle monitoring.
     monitorIdle(context) {
       function clearCurrentTimer() {
-        const timer = context.getters.getIdleTID;
+        const timer = context.state.idleTimer;
+        if (!timer) {
+          console.log('no timer found');
+          return;
+        }
         clearInterval(timer);
         context.commit('setIdleTimer', null);
+        console.log('cleared timer');
       }
 
       function checkExpires() {
-        if (context.getters.idleHasExpired) {
+        const expires = context.state.expires;
+        if (expires && Date.now() - expires > 0) {
+          console.log('expiring...');
+          const timer = context.getters.getIdleTID;
+          console.log('timer is', timer);
           clearCurrentTimer();
           console.log('we expired at', new Date());
           context.dispatch('triggerIdleDoneEvent');
+        } else if (expires > 0 && expires - Date.now() < 60 * 1000) {
+          context.dispatch('triggerAboutToExpire');
         }
       }
 
@@ -80,7 +101,6 @@ const store: StoreOptions<IdleStore> = {
         console.log('Will expire at', new Date(expireAt));
         const timer = setInterval(() => {
           checkExpires();
-          console.log('checked idle');
         }, 10 * 1000);
         context.commit('setIdleTimer', timer);
       }
@@ -96,6 +116,8 @@ const store: StoreOptions<IdleStore> = {
           console.log('activity detected');
         }
       });
+      // save it to the store.
+      context.commit('setIdleJSInstance', instance);
       instance.start();
     },
     triggerIdleDoneEvent(context) {
@@ -104,6 +126,18 @@ const store: StoreOptions<IdleStore> = {
         console.log('Idle leads to logout');
         context.dispatch('logout');
       }
+    },
+    triggerAboutToExpire(context) {
+      context.commit('setAboutToExpire', true);
+    },
+    resetIdleCounters(context) {
+      const timer = context.state.idleTimer;
+      if (timer) {
+        clearInterval(timer);
+        context.commit('setIdleTimer', null);
+      }
+      context.commit('setIdle', 0);
+      context.state.idleJs?.reset();
     }
   }
 };
