@@ -1,8 +1,7 @@
-const axios = require('axios');
-const https = require('https');
-const fs = require('fs');
-const promises = fs.promises;
-const jwt = require('jsonwebtoken');
+import axios from 'axios';
+import https from 'https';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
 
 const getDomain = () => {
   return 'localhost:3005';
@@ -18,19 +17,24 @@ const options = {
 };
 
 const loadOptions = (authType = 'token') => {
-  const auth = authType === 'token' ? loadToken() : loadCookie();
-  const optionsWithAuth = { ...options };
-  if (authType === 'cookie') {
-    optionsWithAuth['headers'] = {
-      cookie: auth
-    };
+  if (authType !== 'none') {
+    const auth = authType === 'token' ? loadToken() : loadCookie();
+    const optionsWithAuth = { ...options };
+    if (authType === 'cookie') {
+      optionsWithAuth['headers'] = {
+        cookie: auth
+      };
+    }
+    else if (authType === 'token') {
+      optionsWithAuth['headers'] = {
+        'Authorization': 'Bearer ' + auth
+      };
+    }
+    return optionsWithAuth;
   }
-  else if (authType === 'token') {
-    optionsWithAuth['headers'] = {
-      'Authorization': 'Bearer ' + auth
-    };
+  else {
+    return options;
   }
-  return optionsWithAuth;
 };
 
 function getTokenData(token) {
@@ -87,25 +91,15 @@ const buildAxiosParams = params => {
   return axiosParams;
 }
 
-const getTest = () => {
+const getTest = async () => {
   const url = `http://${domain}/auth/signup`;
   let resp;
   try {
-    axios.get(url, loadOptions('token'))
-      .then(data => {
-        resp = data;
-        throw 'got-data';
-      })
-      .catch(err => {
-        if (err === 'got-data') {
-          console.log('got data 1', resp.data);
-          return;
-        }
-        throw new Error(err);
-      });
+    resp = await axios.get(url, loadOptions());
+    console.log(resp.data);
   }
   catch (err) {
-    console.log(err.toString());
+    console.log(err.message);
   }
   return resp && resp.data ? resp.data : '';
 }
@@ -114,29 +108,15 @@ const currentUser = async () => {
   const url = `http://${domain}/auth/current-user`;
   let resp;
   try {
-    axios.get(url, loadOptions())
-      .then(data => {
-        resp = data;
-        throw 'got-data';
-      })
-      .catch(err => {
-        if (err === 'got-data') {
-          console.log('got data 1', resp.data);
-          return;
-        }
-        throw new Error(err);
-      });
-
+    resp = await axios.get(url, loadOptions());
     return resp.data;
   }
   catch (err) {
-    console.log(err.toString());
-    if (err.toJSON) {
-      console.log(err.toJSON());
-    }
+    console.log(err.message);
   }
   return null;
 }
+
 
 const signupUser = async (name, email, password) => {
   const url = `http://${domain}/auth/signup`;
@@ -147,100 +127,66 @@ const signupUser = async (name, email, password) => {
   }
   let resp;
   try {
-    axios.post(url, data, loadOptions())
-      .then(data => {
-        console.log('entered then');
-        resp = data;
-        if (resp.data && resp.data.token) {
-          writeToken(resp.data.token);
-          const payload = getTokenData(resp.data.token);
-          console.log('token:', payload);
-        }
-        throw 'got-data';
-      })
-      .catch(err => {
-        if (err === 'got-data') {
-          console.log('got data 1', resp.data);
-          return;
-        }
-        throw new Error(err);
-      });
+    resp = await axios.post(url, data, loadOptions('none'));
 
+    if (resp.data && resp.data.token) {
+      writeToken(resp.data.token);
+      const payload = getTokenData(resp.data.token);
+      console.log('token:', payload);
+    }
     return resp.data;
   }
   catch (err) {
     console.log(err.toString());
-    if (err.toJSON) {
+    if (err.toJSON()) {
       console.log(err.toJSON());
     }
   }
   return [];
 }
 
-const signin = (email, password) => {
+const signin = async (email, password) => {
   const url = `http://${domain}/auth/signin`;
   let resp;
   try {
-    axios.post(url, {
+    resp = await axios.post(url, {
       email,
       password
-    }, options)
-      .then(data => {
-        resp = data;
-        console.log(data);
-        if (resp.data && resp.data.token) {
-          writeToken(resp.data.token);
-          const payload = getTokenData(resp.data.token);
-          console.log('token:', payload);
-        }
-        throw 'got-data';
-      })
-      .catch(err => {
-        if (err === 'got-data') {
-          console.log('got data 1', resp);
-          return;
-        }
-        throw new Error(err);
-      });
-
+    }, options);
+    if (resp.data && resp.data.token) {
+      writeToken(resp.data.token);
+      const payload = getTokenData(resp.data.token);
+      console.log('token:', payload);
+    }
     return resp.data;
   }
   catch (err) {
     console.log(err.toString());
   }
+  return null;
 };
 
 
-const getRequests = (params = {}) => {
+const getRequests = async () => {
+
   const url = `http://${domain}/api/requests`;
   const options = loadOptions();
-  const axiosParams = buildAxiosParams(params);
-  options.params = axiosParams;
-  console.log(axiosParams);
+  // const axiosParams = buildAxiosParams(params);
+  // options.params = axiosParams;
+  // console.log(axiosParams);
   let resp;
   try {
-    axios.get(url, options)
-      .then(data => {
-        resp = data;
-        throw 'got-data';
-      })
-      .catch(err => {
-        if (err === 'got-data') {
-          console.log('got data 1', resp.data);
-          return;
-        }
-        console.log(err.toString());
-      });
+    resp = await axios.get(url, options);
+    return resp.data;
   }
   catch (err) {
-    if (err === 'got-data') {
-      return resp.data;
-    }
+    console.log(err.toString());
+    // return resp.data;
   }
   return [];
 }
 
-const signout = (authType = 'cookie') => {
+const signout = (authType = 'token') => {
   // Just toss the cookie.
   const file = authType == 'cookie' ? 'cookies.txt' : 'token.txt';
   if (fs.existsSync('./' + file)) {
@@ -249,38 +195,48 @@ const signout = (authType = 'cookie') => {
   }
 }
 
+
+const email = 'kenny@killroy.com';
+const password = 'secret';
+const name = 'kenny';
+
+// const data = await signupUser(name, email, password);
+// const data = await signin(email, password);
+// const user = await currentUser();
+// console.log(user);
+// // console.log(data);
+// const loaded = await getRequests();
+// console.log(loaded);
+
 const args = process.argv.slice(2);
 
 const dispatch = {
   help: () => {
     console.error('no help yet');
   },
-  test: () => {
-    const rslt = getTest();
+  test: async () => {
+    const rslt = await getTest();
     console.log('run test', rslt);
   },
-  user: () => {
-    const rslt = currentUser();
+  user: async () => {
+    const rslt = await currentUser();
+    console.log(rslt);
   },
-  requests: () => {
+  requests: async () => {
     params = {
       // coachId: 'c3'
     };
-    const rslt = getRequests(params);
+    const rslt = await getRequests(params);
     console.log(rslt);
   },
-  signup: (name, email, password) => {
+  signup: async (name, email, password) => {
     name = name || 'yaya3';
     email = email || 'yaya3@yayas.org';
     password = password || 'yayayayaya';
-    const reply = signupUser(name, email, password);
-    let val;
-    reply.then(data => {
-      val = data;
-    });
-    console.log('signup returned:', val);
+    const reply = await signupUser(name, email, password);
+    console.log('signup returned:', reply);
   },
-  signin: (email, password) => {
+  signin: async (email, password) => {
     email = email || 'yaya3@yayas.org';
     password = password || 'yayayayaya';
     if (!email || !password) {
@@ -288,7 +244,8 @@ const dispatch = {
       return;
     }
     console.log('email', email, 'pw', password);
-    signin(email, password);
+    const rslt = await signin(email, password);
+    console.log(rslt);
   },
   signout: () => {
     signout('token');
@@ -296,7 +253,6 @@ const dispatch = {
   },
 
 };
-
 
 // signUp('yaya@yayas.org', 'yayayayaya');
 if (!args[0]) {
