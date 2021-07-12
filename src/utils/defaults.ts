@@ -4,10 +4,10 @@
 const baseEnvVar = (baseName: string, defaultVal: string) => {
   let val = '';
   if (process.env['VUE_APP_' + baseName]) {
-    val = process.env['VUE_APP_' + baseName];
+    val = process.env['VUE_APP_' + baseName] || '';
     console.log(baseName, val);
   } else if (process.env[baseName]) {
-    val = process.env[baseName];
+    val = process.env[baseName] || '';
   } else {
     val = defaultVal;
   }
