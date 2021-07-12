@@ -4,6 +4,7 @@ import router from '../routes';
 import { Ref } from 'vue';
 import theCountDown from './countDowner';
 import jwt from 'jsonwebtoken';
+import ms from 'ms';
 
 export interface AuthStore {
   loggedIn: string;
@@ -261,6 +262,12 @@ const store: StoreOptions<AuthStore> = {
     // handle token renewal
     async renew(context) {
       console.log('send a renewal message to server here');
+
+      function token2interval(token: string) {
+        const data = jwt.decode(token) as jwt.JwtPayload;
+        return ms((data.exp! - data.iat!) * 1000);
+      }
+
       try {
         const token = context.getters.jwtToken;
         const user = await fetcher<User>('auth/renew', 'GET', token);
@@ -271,10 +278,12 @@ const store: StoreOptions<AuthStore> = {
           token: user.token,
           expires: user.expires || 0
         });
+        console.log('session extended to', new Date(user.expires! * 1000));
         context.dispatch('stopCountdown');
         window.scroll(0, 0);
-        context.dispatch('setFlash', 'Session renewed.');
-        console.log('extended session');
+        const renewalFor = token2interval(user.token);
+        context.dispatch('setFlash', 'Session renewed for ' + renewalFor);
+        console.log('extended session for', renewalFor);
       } catch (err) {
         console.log('got back an error, not a user:', err.message);
       }
