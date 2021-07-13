@@ -71,7 +71,7 @@
         <base-button>
           Submit Your Info
         </base-button>
-        <base-button @click.prevent="clearRegForm" mode="outline">
+        <base-button @click.prevent="clearRegForm" @mouseover="unselectFields" mode="outline">
           Clear Form
         </base-button>
       </form>
@@ -101,7 +101,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
 
-    const { clearForm, resetListener, triggerClearForm } = useFormHooks();
+    const { clearForm, resetListener, triggerClearForm, unselectFields } = useFormHooks();
 
     function clearRegFields() {
       areas.value = [];
@@ -215,7 +215,8 @@ export default defineComponent({
       submitInfo,
       clearForm,
       clearRegForm,
-      resetListener
+      resetListener,
+      unselectFields
     };
 
   },

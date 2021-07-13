@@ -7,6 +7,7 @@ import flashStore from './flash';
 import requestStore from './requests';
 import authStore, { AuthStore} from './auth';
 import idleStore, { IdleStore } from './idle';
+import formContext, { FormContextStore } from './formContext';
 
 enum LoadingState {
   unset = 0,
@@ -25,6 +26,7 @@ interface RootStore {
   root: CoachList;
   auth: AuthStore;
   idle: IdleStore;
+  formContext: FormContextStore;
 }
 
 export const key: InjectionKey<Store<RootStore>> = Symbol()
@@ -49,7 +51,9 @@ const store = createStore<CoachList>({
     // @ts-ignore
     auth: authStore,
     // @ts-ignore
-    idle: idleStore
+    idle: idleStore,
+    // @ts-ignore
+    formContext: formContext
   },
   // @ts-ignore
   state () {

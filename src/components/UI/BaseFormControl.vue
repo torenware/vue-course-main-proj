@@ -15,7 +15,8 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed,  onMounted } from 'vue'
+import { defineComponent, ref, Ref, computed,  onMounted } from 'vue';
+import { useStore } from '@/store';
 
 export default defineComponent({
   props: {
@@ -31,7 +32,8 @@ export default defineComponent({
   setup(props, context) {
     const formControl: Ref<Element | null> = ref(null);
     const controlValid = ref(true);
-    // const listeningControls = ref([]);
+
+    const store = useStore();
 
     const invalidClass = computed(() => {
       if (!controlValid.value) {
@@ -58,8 +60,13 @@ export default defineComponent({
     function handleInvalid(){
       // hack: we need to avoid setting the
       // control as invalid if we are in a clearForm
-      controlValid.value = false;
-
+      if (!store.state.formContext.clearingForm && !store.state.formContext.processingBlur) {
+        controlValid.value = false;
+        console.log('set in invalid handler');
+      }
+      else {
+        console.log('skipping invalid set during clearForm');
+      }
     }
 
 

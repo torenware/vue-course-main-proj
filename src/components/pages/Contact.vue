@@ -78,7 +78,7 @@ export default defineComponent({
     const message = ref('');
     const form: Ref<HTMLFormElement|null> = ref(null);
 
-    const { clearForm, resetListener, triggerClearForm } = useFormHooks();
+    const { clearForm, resetListener, triggerClearForm, unselectFields } = useFormHooks();
 
     const idParam = computed(() => {
       const {params} = route;
@@ -89,14 +89,6 @@ export default defineComponent({
       const rslt: Coach | null = store.getters.coachById(idParam.value);
       return rslt;
     });
-
-    function unselectFields() {
-      const controls = form.value?.querySelectorAll('input:focus, textarea:focus');
-      controls!.forEach(ctl => {
-        (ctl as HTMLObjectElement).blur();
-
-      });
-    }
 
 
     function printEvent(evt: Event) {

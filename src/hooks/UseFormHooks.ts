@@ -1,4 +1,5 @@
 import { Ref } from 'vue';
+import store from '@/store';
 
 const useFormHooks = () => {
   function hasInvalidControl(evt: Event): boolean {
@@ -13,7 +14,8 @@ const useFormHooks = () => {
   }
 
   function clearForm(form: HTMLFormElement) {
-    console.log('CF called');
+    store.commit('setClearingForm', true);
+    console.log('CF called', store.getters.inClearingForm);
     if (!form) {
       console.log('no form obj');
     }
@@ -39,14 +41,20 @@ const useFormHooks = () => {
     invalidElements.forEach(item => {
       item.classList.remove('invalid');
     });
+    console.log('unsetting setClearingForm');
+    store.commit('setClearingForm', false);
   }
 
+  // Used to make sure the clear/reset button can
+  // get focus if a field is selected.
   function unselectFields(evt: Event) {
     const form = (evt.target as HTMLObjectElement).form;
     const controls = form!.querySelectorAll('input:focus, textarea:focus');
+    store.commit('setProcessingBlur', true);
     controls!.forEach(ctl => {
       (ctl as HTMLObjectElement).blur();
     });
+    store.commit('setProcessingBlur', false);
   }
 
   function triggerClearForm(evt: Event) {
@@ -59,7 +67,7 @@ const useFormHooks = () => {
 
   function resetListener(evt: Event) {
     console.log(evt);
-    const form = (evt.target as HTMLFormElement).form;
+    const form = evt.target as HTMLFormElement;
     if (form) {
       clearForm(form);
       console.log('cleared form widgets and models');
