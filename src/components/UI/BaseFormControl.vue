@@ -56,9 +56,10 @@ export default defineComponent({
     }
 
     function handleInvalid(){
-      setTimeout(() => {
-        controlValid.value = false;
-      }, 500);
+      // hack: we need to avoid setting the
+      // control as invalid if we are in a clearForm
+      controlValid.value = false;
+
     }
 
 

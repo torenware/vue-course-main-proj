@@ -2,7 +2,7 @@
   <section>
     <base-card>
       <h2>Register as a Coach With Us!</h2>
-      <form @submit.prevent="submitInfo" ref='regForm'>
+      <form @submit.prevent="submitInfo" @reset="resetListener" ref='regForm'>
         <base-form-control>
           <template #default="slotProps">
           <input type="text"
@@ -71,7 +71,7 @@
         <base-button>
           Submit Your Info
         </base-button>
-        <base-button @click.prevent="clearForm" mode="outline">
+        <base-button @click.prevent="clearRegForm" mode="outline">
           Clear Form
         </base-button>
       </form>
@@ -83,6 +83,7 @@
 import { defineComponent, ref, Ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
+import useFormHooks from '@/hooks/UseFormHooks';
 
 export default defineComponent({
   setup() {
@@ -99,6 +100,17 @@ export default defineComponent({
 
     const store = useStore();
     const router = useRouter();
+
+    const { clearForm, resetListener, triggerClearForm } = useFormHooks();
+
+    function clearRegFields() {
+      areas.value = [];
+      firstName.value = '';
+      lastName.value = '';
+      hourlyRate.value = null;
+      description.value = '';
+
+    }
 
     function hasInvalidControl(evt: Event): boolean {
       if (evt.type === 'submit') {
@@ -159,31 +171,13 @@ export default defineComponent({
       markAreaGroupValidity(groupValid);
     }
 
-    function clearForm() {
-      if (!regForm.value) {
-        console.log('regform ref not up');
-        return;
-      }
-      const controls = regForm.value.querySelectorAll('input,select,textarea');
-      controls.forEach(item => {
-        // @ts-ignore
-        if (item.tagName.toLowerCase() === 'input') {
-          const input = item as HTMLInputElement;
-          if (input.type === 'checkbox' || input.type === 'radio') {
-            input.checked = false;
-          }
-          else {
-            input.value = '';
-          }
-        }
-        else {
-          // @ts-ignore
-          item.value = '';
-        }
-      });
+    function clearRegForm(evt: Event) {
+      clearRegFields();
+      triggerClearForm(evt);
     }
 
     const submitInfo = (evt: Event) => {
+      const form = evt.target as HTMLFormElement;
       const areasOK = validateAreaGroup();
       markAreaGroupValidity(areasOK);
       if (!areasOK || hasInvalidControl(evt)) {
@@ -199,7 +193,7 @@ export default defineComponent({
       try {
         store.dispatch('addCoach', payload);
         store.dispatch('setFlash', 'Thank you for registering with us!');
-        clearForm();
+        clearForm(form);
       }
       catch (err) {
         store.dispatch('setFlash', 'We were not able to connect to the database. Please try again later');
@@ -220,6 +214,8 @@ export default defineComponent({
       checkBoxChanged,
       submitInfo,
       clearForm,
+      clearRegForm,
+      resetListener
     };
 
   },

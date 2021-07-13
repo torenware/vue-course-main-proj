@@ -14,6 +14,9 @@ const useFormHooks = () => {
 
   function clearForm(form: HTMLFormElement) {
     console.log('CF called');
+    if (!form) {
+      console.log('no form obj');
+    }
     // Empty the fields:
     const controls = form.querySelectorAll('input,select,textarea');
     controls.forEach(item => {
@@ -55,7 +58,8 @@ const useFormHooks = () => {
   }
 
   function resetListener(evt: Event) {
-    const form = (evt.target as HTMLObjectElement).form;
+    console.log(evt);
+    const form = (evt.target as HTMLFormElement).form;
     if (form) {
       clearForm(form);
       console.log('cleared form widgets and models');
