@@ -1,10 +1,10 @@
 <template>
-  <div class="control-wrapper">
-    <div class="form-control"
-        ref="formControl"
-        :class="invalidClass"
-        @invalid="handleInvalid"
-    >
+  <div class="control-wrapper"
+    ref="formControl"
+    :class="invalidClass"
+    @invalid="handleInvalid"
+  >
+    <div class="form-control" :class="invalidClass">
       <slot :notify="notifyFC"></slot>
     </div>
       <div class="error" v-if="getMessage && !controlValid">
@@ -15,17 +15,21 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, computed,  onMounted } from 'vue'
+import { defineComponent, ref, Ref, computed,  onMounted } from 'vue'
 
 export default defineComponent({
   props: {
     customMsg: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
+    // form: {
+    //   type: Object as () => HTMLFormElement,
+    //   required: true
+    // }
   },
   setup(props, context) {
-    const formControl = ref(null);
+    const formControl: Ref<Element | null> = ref(null);
     const controlValid = ref(true);
     // const listeningControls = ref([]);
 
@@ -64,8 +68,9 @@ export default defineComponent({
         return;
       }
       let isValid = true;
-      control.forEach((ctl: HTMLObjectElement) => {
-        if (!ctl.checkValidity()) {
+      control.forEach((ctl: Element) => {
+        const HOEl = ctl as HTMLObjectElement;
+        if (!HOEl.checkValidity()) {
           isValid = false;
         }
       });
@@ -82,7 +87,7 @@ export default defineComponent({
         return props.customMsg;
       }
       // @ts-ignore
-      const control = formControl.value.querySelector('input,textarea');
+      const control = formControl.value.querySelector('input,textarea') as HTMLObjectElement;
       if (!control) {
         return "";
       }
@@ -94,11 +99,34 @@ export default defineComponent({
       controlValid.value = true;
     }
 
+    function addResetListenerForForm(form: HTMLFormElement) {
+      // eslint-disable no-unused-vars
+      // @ts-ignore
+      form.addEventListener('reset', (_el: HTMLFormElement, _evt: Event) => {
+        _el; _evt;
+        controlValid.value = true;
+        console.log('fired for control');
+      }, {
+        capture: true,
+        once: false,
+      });
+      // eslint-enable no-unused-vars
+    }
+
     onMounted(() => {
+
       if (formControl.value) {
-        // @ts-ignore
+        console.log('setting up the form listeners');
+        // look for form widgets and find the owning form.
         const controls = formControl.value!.querySelectorAll('input,textarea,select');
+        let form: HTMLFormElement | undefined;
         controls.forEach((ctl: Element) => {
+          const fCtl = ctl as HTMLObjectElement;
+          if (!form && fCtl.form) {
+            form = fCtl.form;
+            addResetListenerForForm(form);
+          }
+          // and listen to the widget's invalid messages.
           ctl.addEventListener('invalid', () => {
             context.emit('invalid');
           });
@@ -123,13 +151,20 @@ export default defineComponent({
 <style lang="scss" scoped>
   .control-wrapper {
     margin-bottom: 1rem;
+
+    &.invalid {
+
+      div.error {
+        margin-top: .5rem;
+        color: red;
+        opacity: .6;
+      }
+
+    }
+
+
   }
 
-  div.error {
-    margin-top: .5rem;
-    color: red;
-    opacity: .6;
-  }
 
 
   div.form-control {
@@ -141,11 +176,12 @@ export default defineComponent({
       margin: 0;
    }
 
-    &.invalid {
+   &.invalid {
     input, label, textarea, select, div.error {
       color: red;
       border-color: lightcoral;
     }
    }
-  }
+
+}
 </style>

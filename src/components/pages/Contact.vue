@@ -4,7 +4,7 @@
     </h3>
   <base-card>
 
-  <form @submit.prevent="submitContact" ref="form" v-if="coach">
+  <form @submit.prevent="submitContact" @reset="resetListener" ref="form" v-if="coach">
     <base-form-control>
       <template #default="slotProps">
         <input id="title"
@@ -44,6 +44,9 @@
     </base-form-control>
 
     <base-button mode="outline">Send</base-button>
+    <base-button mode="outline" type="reset">
+      Reset
+    </base-button>
   </form>
   <div v-else>
     <p>Sorry! Contacting this coach is not available now for this coach</p>
@@ -53,7 +56,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { Coach } from '@/types';
 import { useStore } from '@/store';
 import useFormHooks from '@/hooks/UseFormHooks';
@@ -61,6 +64,9 @@ import useFormHooks from '@/hooks/UseFormHooks';
 export default defineComponent({
   setup() {
     const store = useStore();
+    const route = useRoute();
+    const router = useRouter();
+
     const subject = ref('');
     const email = ref('');
     const message = ref('');
@@ -69,7 +75,7 @@ export default defineComponent({
     const { clearForm } = useFormHooks();
 
     const idParam = computed(() => {
-      const {params} = useRoute();
+      const {params} = route;
       return params.id;
     });
 
@@ -77,6 +83,14 @@ export default defineComponent({
       const rslt: Coach | null = store.getters.coachById(idParam.value);
       return rslt;
     });
+
+
+    function resetListener() {
+      if (form.value) {
+        clearForm(form);
+        console.log('cleared form widgets and models');
+      }
+    }
 
     const submitContact = async () => {
       const newRequest = {
@@ -89,6 +103,8 @@ export default defineComponent({
         await store.dispatch('requests/addRequest', newRequest);
         await store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
         clearForm(form);
+        router.push('/');
+
       }
       catch (err) {
         store.dispatch('setFlash', 'Sorry! We had a problem saving your message. Please try later.');
@@ -104,6 +120,7 @@ export default defineComponent({
       email,
       message,
       submitContact,
+      resetListener
     }
   },
 })
