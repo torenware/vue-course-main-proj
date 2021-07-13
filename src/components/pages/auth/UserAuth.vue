@@ -3,40 +3,31 @@
   <form @submit.prevent="submitAuth" ref="formRef">
     <h2>{{ isLoginForm ? "Please Sign In" : "Signing Up On Our Site"}}</h2>
     <base-form-control v-if="!isLoginForm">
-      <template #default="slotProps">
+      <template #default>
         <input id="name"
           type="text"
           placeholder="Your Name"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="name">
          </template>
     </base-form-control>
 
     <base-form-control custom-msg="Please enter a valid email">
-      <template #default="slotProps">
+      <template #default>
         <input id="email"
           type="email"
           placeholder="Contact Email"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="email">
          </template>
     </base-form-control>
 
     <base-form-control>
-      <template #default="slotProps">
+      <template #default>
         <input id="password"
           type="password"
           placeholder="Password"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="password">
          </template>
     </base-form-control>
