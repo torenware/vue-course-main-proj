@@ -6,39 +6,30 @@
 
   <form @submit.prevent="submitContact" @reset="resetListener" ref="form" v-if="coach">
     <base-form-control>
-      <template #default="slotProps">
+      <template #default>
         <input id="title"
           type="text"
           placeholder="Subject of Your Post"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="subject">
          </template>
     </base-form-control>
 
     <base-form-control custom-msg="Please enter a valid email">
-      <template #default="slotProps">
+      <template #default>
         <input id="email"
           type="email"
           placeholder="Contact Email"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="email">
          </template>
     </base-form-control>
 
     <base-form-control>
-      <template #default="slotProps">
+      <template #default>
       <textarea rows="5" cols="40"
           placeholder="Your message here"
           required
-          @invalid="slotProps.notify('invalid')"
-          @change="slotProps.notify('change')"
-          @blur="slotProps.notify('blur')"
           v-model.trim="message"></textarea>
       </template>
     </base-form-control>

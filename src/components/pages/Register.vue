@@ -4,36 +4,27 @@
       <h2>Register as a Coach With Us!</h2>
       <form @submit.prevent="submitInfo" @reset="resetListener" ref='regForm'>
         <base-form-control>
-          <template #default="slotProps">
+          <template #default>
           <input type="text"
                  placeholder="First Name"
                  required
-                @invalid="slotProps.notify('invalid')"
-                @change="slotProps.notify('change')"
-                @blur="slotProps.notify('blur')"
                  v-model.trim="firstName">
           </template>
         </base-form-control>
         <base-form-control>
-          <template #default="slotProps">
+          <template #default>
           <input type="text"
                  placeholder="Last Name"
                  required
-                @invalid="slotProps.notify('invalid')"
-                @change="slotProps.notify('change')"
-                @blur="slotProps.notify('blur')"
                  v-model.trim="lastName" >
           </template>
         </base-form-control>
         <base-form-control>
-          <template #default="slotProps">
+          <template #default>
           <input type="number" step="0.01"
                  ref="rate"
                  placeholder="Hourly Rate (US $)"
                  required
-                @invalid="slotProps.notify('invalid')"
-                @change="slotProps.notify('change')"
-                @blur="slotProps.notify('blur')"
                  v-model.number="hourlyRate">
           </template>
         </base-form-control>
@@ -56,14 +47,11 @@
           </div>
         </div>
         <base-form-control>
-          <template #default="slotProps">
+          <template #default>
           <textarea
                placeholder="Short description or bio"
                v-model.trim="description"
                required
-                @invalid="slotProps.notify('invalid')"
-                @change="slotProps.notify('change')"
-                @blur="slotProps.notify('blur')"
                rows="5"
           />
           </template>

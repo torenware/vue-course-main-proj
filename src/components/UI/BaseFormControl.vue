@@ -44,6 +44,13 @@ export default defineComponent({
       }
     });
 
+    // HOF to handle event listeners.
+    function notify(evtType: string) {
+      return () => {
+        notifyFC(evtType);
+      };
+    }
+
     function notifyFC(evtType: string) {
       switch(evtType) {
         case 'invalid':
@@ -125,6 +132,12 @@ export default defineComponent({
       // eslint-enable no-unused-vars
     }
 
+    function addEventListenersForControls(el: Element) {
+      el.addEventListener('blur', notify('blur'));
+      el.addEventListener('change', notify('change'));
+      el.addEventListener('invalid', notify('invalid'));
+    }
+
     onMounted(() => {
       if (formControl.value) {
         // look for form widgets and find the owning form.
@@ -136,6 +149,8 @@ export default defineComponent({
             form = fCtl.form;
             addResetListenerForForm(form);
           }
+          // General UI responses to control events.
+          addEventListenersForControls(ctl);
           // and listen to the widget's invalid messages.
           ctl.addEventListener('invalid', () => {
             context.emit('invalid');
