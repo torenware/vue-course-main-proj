@@ -46,7 +46,7 @@
     <base-button mode="outline">Send</base-button>
     <base-button
       mode="outline"
-      @click.prevent="triggerClearForm"
+      @click.prevent="clearContactForm"
       @hover="unselectFields"
       @mouseover="unselectFields"
     >
@@ -79,6 +79,17 @@ export default defineComponent({
     const form: Ref<HTMLFormElement|null> = ref(null);
 
     const { clearForm, resetListener, triggerClearForm, unselectFields } = useFormHooks();
+
+    function clearContactFields() {
+      subject.value = '';
+      email.value = '';
+      message.value = '';
+    }
+
+    function clearContactForm(evt: Event) {
+      clearContactFields();
+      triggerClearForm(evt);
+    }
 
     const idParam = computed(() => {
       const {params} = route;
@@ -126,7 +137,8 @@ export default defineComponent({
       resetListener,
       triggerClearForm,
       unselectFields,
-      printEvent
+      printEvent,
+      clearContactForm
     }
   },
 })
