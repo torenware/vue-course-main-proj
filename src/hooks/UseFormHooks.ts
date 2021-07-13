@@ -12,18 +12,13 @@ const useFormHooks = () => {
     return false;
   }
 
-  function clearForm(formRef: Ref<HTMLFormElement | null>) {
-    if (!formRef.value) {
-      console.log('form ref not up');
-      return;
-    }
-    console.log('form ref is set up.');
+  function clearForm(form: HTMLFormElement) {
+    console.log('CF called');
     // Empty the fields:
-    const controls = formRef.value.querySelectorAll('input,select,textarea');
+    const controls = form.querySelectorAll('input,select,textarea');
     controls.forEach(item => {
       // @ts-ignore
       if (item.tagName.toLowerCase() === 'input') {
-        console.log('processing input widget');
         const input = item as HTMLInputElement;
         if (input.type === 'checkbox' || input.type === 'radio') {
           input.checked = false;
@@ -37,15 +32,44 @@ const useFormHooks = () => {
     });
 
     // Remove the invalid class
-    const invalidElements = formRef.value.querySelectorAll('.invalid');
+    const invalidElements = form.querySelectorAll('.invalid');
     invalidElements.forEach(item => {
       item.classList.remove('invalid');
     });
   }
 
+  function unselectFields(evt: Event) {
+    const form = (evt.target as HTMLObjectElement).form;
+    const controls = form!.querySelectorAll('input:focus, textarea:focus');
+    controls!.forEach(ctl => {
+      (ctl as HTMLObjectElement).blur();
+    });
+  }
+
+  function triggerClearForm(evt: Event) {
+    console.log('dispatch event');
+    const form = (evt.target as HTMLObjectElement).form;
+    const event = document.createEvent('Event');
+    event.initEvent('reset');
+    form?.dispatchEvent(event);
+  }
+
+  function resetListener(evt: Event) {
+    const form = (evt.target as HTMLObjectElement).form;
+    if (form) {
+      clearForm(form);
+      console.log('cleared form widgets and models');
+    } else {
+      console.log('form was NOT set');
+    }
+  }
+
   return {
     hasInvalidControl,
-    clearForm
+    clearForm,
+    unselectFields,
+    triggerClearForm,
+    resetListener
   };
 };
 

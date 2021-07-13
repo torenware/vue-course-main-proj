@@ -113,7 +113,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      clearForm(formRef);
+      clearForm(formRef.value!);
     });
 
     return {

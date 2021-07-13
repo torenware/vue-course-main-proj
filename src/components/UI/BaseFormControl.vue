@@ -46,8 +46,9 @@ export default defineComponent({
       switch(evtType) {
         case 'invalid':
           return handleInvalid();
-        case 'change':
         case 'blur':
+          return handleChange();
+        case 'change':
           return handleChange();
         default:
           return;
@@ -55,8 +56,11 @@ export default defineComponent({
     }
 
     function handleInvalid(){
-      controlValid.value = false;
+      setTimeout(() => {
+        controlValid.value = false;
+      }, 500);
     }
+
 
     function handleChange() {
       if (!formControl.value) {
@@ -114,9 +118,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-
       if (formControl.value) {
-        console.log('setting up the form listeners');
         // look for form widgets and find the owning form.
         const controls = formControl.value!.querySelectorAll('input,textarea,select');
         let form: HTMLFormElement | undefined;

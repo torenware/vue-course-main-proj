@@ -44,7 +44,12 @@
     </base-form-control>
 
     <base-button mode="outline">Send</base-button>
-    <base-button mode="outline" type="reset">
+    <base-button
+      mode="outline"
+      @click.prevent="triggerClearForm"
+      @hover="unselectFields"
+      @mouseover="unselectFields"
+    >
       Reset
     </base-button>
   </form>
@@ -55,14 +60,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, Ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Coach } from '@/types';
 import { useStore } from '@/store';
 import useFormHooks from '@/hooks/UseFormHooks';
 
 export default defineComponent({
-  setup() {
+  setup(props, context) {
+    props; context;
     const store = useStore();
     const route = useRoute();
     const router = useRouter();
@@ -70,9 +76,9 @@ export default defineComponent({
     const subject = ref('');
     const email = ref('');
     const message = ref('');
-    const form = ref(null);
+    const form: Ref<HTMLFormElement|null> = ref(null);
 
-    const { clearForm } = useFormHooks();
+    const { clearForm, resetListener, triggerClearForm } = useFormHooks();
 
     const idParam = computed(() => {
       const {params} = route;
@@ -84,12 +90,17 @@ export default defineComponent({
       return rslt;
     });
 
+    function unselectFields() {
+      const controls = form.value?.querySelectorAll('input:focus, textarea:focus');
+      controls!.forEach(ctl => {
+        (ctl as HTMLObjectElement).blur();
 
-    function resetListener() {
-      if (form.value) {
-        clearForm(form);
-        console.log('cleared form widgets and models');
-      }
+      });
+    }
+
+
+    function printEvent(evt: Event) {
+      console.log(evt.type);
     }
 
     const submitContact = async () => {
@@ -102,7 +113,7 @@ export default defineComponent({
       try {
         await store.dispatch('requests/addRequest', newRequest);
         await store.dispatch('setFlash', `Your message was sent to Coach ${coach.value?.firstName}`);
-        clearForm(form);
+        clearForm(form.value!);
         router.push('/');
 
       }
@@ -120,7 +131,10 @@ export default defineComponent({
       email,
       message,
       submitContact,
-      resetListener
+      resetListener,
+      triggerClearForm,
+      unselectFields,
+      printEvent
     }
   },
 })
