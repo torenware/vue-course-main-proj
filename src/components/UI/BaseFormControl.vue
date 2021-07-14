@@ -59,9 +59,19 @@ export default defineComponent({
           return handleChange();
         case 'change':
           return handleChange();
+        case 'reset':
+          console.log('reset gets called for control');
+          return;
         default:
+          console.log('got event of type ', evtType);
           return;
       }
+    }
+
+    // Handler for fc-reset custom events:
+    function handleFCReset(evt: Event) {
+      evt;
+      controlValid.value = true;
     }
 
     function handleInvalid(){
@@ -136,6 +146,7 @@ export default defineComponent({
       el.addEventListener('blur', notify('blur'));
       el.addEventListener('change', notify('change'));
       el.addEventListener('invalid', notify('invalid'));
+      el.addEventListener('fc-reset', handleFCReset);
     }
 
     onMounted(() => {

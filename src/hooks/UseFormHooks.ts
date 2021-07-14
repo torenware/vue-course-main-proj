@@ -22,6 +22,9 @@ const useFormHooks = () => {
     // Empty the fields:
     const controls = form.querySelectorAll('input,select,textarea');
     controls.forEach(item => {
+      // tell the control to update its internal data.
+      const customEvt = new CustomEvent('fc-reset');
+      item.dispatchEvent(customEvt);
       // @ts-ignore
       if (item.tagName.toLowerCase() === 'input') {
         const input = item as HTMLInputElement;

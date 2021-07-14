@@ -38,8 +38,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { defineComponent, computed, ref, onMounted, onUpdated } from 'vue';
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import useFormHooks from '../../../hooks/UseFormHooks';
 import { useStore } from '@/store';
 
@@ -103,7 +103,22 @@ export default defineComponent({
       }
     }
 
+
+    // Called when switching between signup and login,
+    // which share this component.
+    onBeforeRouteUpdate(() => {
+      // In 3.1.4 and VR 4.0.10, this is *never* called.
+      console.log('route update called')
+      clearForm(formRef.value!);
+    });
+
+    // temp: call onUpdated instead
+    onUpdated(() => {
+      clearForm(formRef.value!);
+    });
+
     onMounted(() => {
+      console.log('login/signup mounting');
       clearForm(formRef.value!);
     });
 
