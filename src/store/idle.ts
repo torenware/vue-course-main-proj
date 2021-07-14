@@ -136,6 +136,7 @@ const store: StoreOptions<IdleStore> = {
         context.commit('setIdleTimer', null);
       }
       context.commit('setIdle', 0);
+      context.commit('setAboutToExpire', false);
       context.state.idleJs?.reset();
     }
   }

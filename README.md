@@ -16,8 +16,7 @@ I'm using:
 * I use flash messages for error notification and status updates.
 * I have a count-down widget that appears a couple of minutes before the token expires.
 * I've also implemented token renewal on the server, and implemented a dialog that comes up that asks if the user wants more time. If she does, the server pings a GET API endpoint that returns the new and updated token.
-* I've added idle detection, and if the (configurable) time passes, I log the user off. No UI beyond a flash message you'll miss if you don't watch closely.
-
+* I've added idle detection, and if the (configurable) time passes, I log the user off. Just before logout occurs, I put up a dialog similar to the token-time-out dialog, which comes down when logout actually occurs.
 Have I gone a bit nuts here? Yeah, maybe. But I figure than this should be a good portfolio project, particularly for someone who wants to hire a Vue 3 developer.
 
 ## Setup
