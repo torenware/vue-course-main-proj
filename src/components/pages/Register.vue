@@ -23,6 +23,7 @@
           <template #default>
           <input type="number" step="0.01"
                  ref="rate"
+                 @input="cageNumber"
                  placeholder="Hourly Rate (US $)"
                  required
                  v-model.number="hourlyRate">
@@ -79,7 +80,7 @@ export default defineComponent({
     const areas = ref([]);
     const firstName = ref('');
     const lastName = ref('');
-    const hourlyRate = ref(null);
+    const hourlyRate: Ref<number|null> = ref(null);
     const rate = ref(null); // ref to DOM.
     const description = ref('');
 
@@ -91,15 +92,6 @@ export default defineComponent({
 
     const { clearForm, resetListener, triggerClearForm, unselectFields, hasInvalidControl } = useFormHooks();
 
-    function clearRegFields() {
-      areas.value = [];
-      firstName.value = '';
-      lastName.value = '';
-      hourlyRate.value = null;
-      description.value = '';
-
-    }
-
     const shouldBeAvailable = computed(() => {
       const loggedIn = store.getters.loginStatus != '';
       return loggedIn;
@@ -110,6 +102,16 @@ export default defineComponent({
         router.push('/');
       }
     });
+
+    // Enforce format of the number field. Run as @input.
+    function cageNumber(evt: Event) {
+      const fld = evt.target as HTMLInputElement;
+      const val = fld.value;
+      const match = val.match(/^\d+(\.\d{0,2})?/);
+      if (match) {
+        hourlyRate.value = parseFloat(match[0]!);
+      }
+    }
 
     // Validate or invalidate the checkbox group
     // before submit actually occurs.
@@ -156,12 +158,20 @@ export default defineComponent({
       markAreaGroupValidity(groupValid);
     }
 
+    function clearRegFields() {
+      areas.value = [];
+      firstName.value = '';
+      lastName.value = '';
+      hourlyRate.value = null;
+      description.value = '';
+
+    }
+
     function clearRegForm(evt: Event) {
       clearRegFields();
       markAreaGroupValidity(true);
       triggerClearForm(evt);
     }
-
 
     const submitInfo = (evt: Event) => {
       console.log('enter submit');
@@ -176,7 +186,7 @@ export default defineComponent({
         firstName: firstName.value,
         lastName: lastName.value,
         description: description.value,
-        hourlyRate: parseFloat(hourlyRate.value!),
+        hourlyRate: hourlyRate.value!,
         areas: areas.value,
       };
       try {
@@ -206,7 +216,8 @@ export default defineComponent({
       clearRegForm,
       resetListener,
       unselectFields,
-      mouseDown
+      mouseDown,
+      cageNumber
     };
 
   },
