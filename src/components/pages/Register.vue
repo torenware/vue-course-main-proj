@@ -56,7 +56,7 @@
           />
           </template>
         </base-form-control>
-        <base-button>
+        <base-button @mousedown="mouseDown">
           Submit Your Info
         </base-button>
         <base-button @click.prevent="clearRegForm" @mouseover="unselectFields" mode="outline">
@@ -89,7 +89,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
 
-    const { clearForm, resetListener, triggerClearForm, unselectFields } = useFormHooks();
+    const { clearForm, resetListener, triggerClearForm, unselectFields, hasInvalidControl } = useFormHooks();
 
     function clearRegFields() {
       areas.value = [];
@@ -98,17 +98,6 @@ export default defineComponent({
       hourlyRate.value = null;
       description.value = '';
 
-    }
-
-    function hasInvalidControl(evt: Event): boolean {
-      if (evt.type === 'submit') {
-        // @ts-ignore
-        const invalid = evt.target!.querySelector(':invalid');
-        if (invalid) {
-          return true;
-        }
-      }
-      return false;
     }
 
     const shouldBeAvailable = computed(() => {
@@ -121,6 +110,14 @@ export default defineComponent({
         router.push('/');
       }
     });
+
+    // Validate or invalidate the checkbox group
+    // before submit actually occurs.
+    function mouseDown() {
+      console.log('mouse down! mouse down!');
+      const areaOK = validateAreaGroup();
+      markAreaGroupValidity(areaOK);
+    }
 
     function validateAreaGroup() {
       if (!areaCGroup.value) {
@@ -161,12 +158,16 @@ export default defineComponent({
 
     function clearRegForm(evt: Event) {
       clearRegFields();
+      markAreaGroupValidity(true);
       triggerClearForm(evt);
     }
 
+
     const submitInfo = (evt: Event) => {
+      console.log('enter submit');
       const form = evt.target as HTMLFormElement;
       const areasOK = validateAreaGroup();
+      console.log('areasOK', areasOK);
       markAreaGroupValidity(areasOK);
       if (!areasOK || hasInvalidControl(evt)) {
         return;
@@ -204,7 +205,8 @@ export default defineComponent({
       clearForm,
       clearRegForm,
       resetListener,
-      unselectFields
+      unselectFields,
+      mouseDown
     };
 
   },

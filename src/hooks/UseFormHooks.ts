@@ -40,10 +40,10 @@ const useFormHooks = () => {
     });
 
     // Remove the invalid class
-    const invalidElements = form.querySelectorAll('.invalid');
-    invalidElements.forEach(item => {
-      item.classList.remove('invalid');
-    });
+    // const invalidElements = form.querySelectorAll('.invalid');
+    // invalidElements.forEach(item => {
+    //   item.classList.remove('invalid');
+    // });
     console.log('unsetting setClearingForm');
     store.commit('setClearingForm', false);
   }
@@ -69,7 +69,6 @@ const useFormHooks = () => {
   }
 
   function resetListener(evt: Event) {
-    console.log(evt);
     const form = evt.target as HTMLFormElement;
     if (form) {
       clearForm(form);
