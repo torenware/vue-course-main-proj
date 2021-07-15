@@ -70,6 +70,7 @@ const store: StoreOptions<IdleStore> = {
   actions: {
     // This needs to get called to start idle monitoring.
     monitorIdle(context) {
+      // Split the main functionality into nice readable functions:
       function clearCurrentTimer() {
         const timer = context.state.idleTimer;
         if (!timer) {
@@ -78,7 +79,6 @@ const store: StoreOptions<IdleStore> = {
         }
         clearInterval(timer);
         context.commit('setIdleTimer', null);
-        console.log('cleared timer');
       }
 
       function checkExpires() {

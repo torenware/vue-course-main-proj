@@ -63,7 +63,6 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const loading = computed(() => {
-      console.log('LS', store.getters.requestsLoaded);
       return store.getters.requestsLoaded === LS_LOADING;
     });
     store.dispatch('requests/loadRequests');

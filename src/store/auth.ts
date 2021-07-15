@@ -94,14 +94,11 @@ const store: StoreOptions<AuthStore> = {
     },
     setUser(state, user: User | null) {
       if (user) {
-        console.log(user);
         state.loggedIn = user.id;
         state.token = user.token;
         state.email = user.email;
         state.name = user.name;
         state.expires = user.expires;
-        // const expiry = user.expires as number;
-        // console.log('session expires at', state.expires);
       } else {
         state.loggedIn = '';
         state.token = null;
@@ -251,10 +248,8 @@ const store: StoreOptions<AuthStore> = {
     async user(context) {
       const token = context.getters.jwtToken;
       const user = await fetcher<User>('auth/current-user', 'GET', token);
-      console.log('got back user:', user);
       user.token = token;
       const tokenData = jwt.decode(token) as jwt.JwtPayload;
-      console.log('token data', tokenData);
       user.expires = tokenData.exp!;
       console.log('session expires at', new Date(user.expires * 1000));
       context.commit('setUser', user);
@@ -318,7 +313,6 @@ const store: StoreOptions<AuthStore> = {
           false,
           userData
         );
-        console.log(user);
         context.commit('setUser', user);
         saveLocalData({
           userId: user.id,
