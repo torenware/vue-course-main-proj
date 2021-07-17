@@ -38,13 +38,6 @@ const useFormHooks = () => {
         item.value = '';
       }
     });
-
-    // Remove the invalid class
-    // const invalidElements = form.querySelectorAll('.invalid');
-    // invalidElements.forEach(item => {
-    //   item.classList.remove('invalid');
-    // });
-    console.log('unsetting setClearingForm');
     store.commit('setClearingForm', false);
   }
 
@@ -72,7 +65,6 @@ const useFormHooks = () => {
     const form = evt.target as HTMLFormElement;
     if (form) {
       clearForm(form);
-      console.log('cleared form widgets and models');
     } else {
       console.log('form was NOT set');
     }

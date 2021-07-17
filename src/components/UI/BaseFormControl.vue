@@ -79,7 +79,6 @@ export default defineComponent({
       // control as invalid if we are in a clearForm
       if (!store.state.formContext.clearingForm && !store.state.formContext.processingBlur) {
         controlValid.value = false;
-        console.log('set in invalid handler');
       }
       else {
         console.log('skipping invalid set during clearForm');

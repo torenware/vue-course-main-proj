@@ -37,7 +37,6 @@ const routes: RouteRecordRaw[] = [
         // This will either succeed silently, or
         // throw.
         store.dispatch('validateCoach', cid);
-        console.log('validated coach');
         return true;
       } catch (err) {
         // Something catestrophically wrong...
@@ -72,7 +71,6 @@ const routes: RouteRecordRaw[] = [
     path: '/requests',
     component: RequestList,
     beforeEnter: to => {
-      console.log('BE router called');
       try {
         const userId = store.getters.loginStatus;
         if (userId) {
@@ -103,7 +101,6 @@ const router = createRouter({
 });
 
 router.beforeResolve(to => {
-  console.log('before resolve');
   return true;
 });
 
