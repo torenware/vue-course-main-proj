@@ -31,12 +31,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/coaches/:id',
     component: CoachDetails,
-    beforeEnter: to => {
+    beforeEnter: async to => {
       const cid = to.params.id;
       try {
         // This will either succeed silently, or
         // throw.
-        store.dispatch('validateCoach', cid);
+        await store.dispatch('validateCoach', cid);
         return true;
       } catch (err) {
         // Something catestrophically wrong...
@@ -70,11 +70,11 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/requests',
     component: RequestList,
-    beforeEnter: to => {
+    beforeEnter: async to => {
       try {
         const userId = store.getters.loginStatus;
         if (userId) {
-          store.dispatch('validateCoach', userId);
+          await store.dispatch('validateCoach', userId);
         }
         if (userId && store.getters.currentCoach) {
           return true;
