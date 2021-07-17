@@ -135,31 +135,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
- label {
-   display: block;
- }
- .form-control {
-   margin-bottom: 1rem;
-   display: flex;
-   align-items: flex-start;
- }
-
- input, label {
-  height: 2.5rem;
-}
-
-input, textarea {
-  flex: 1;
-}
-
- form div.error.invalid {
-   display: none;
- }
- .form-control.invalid {
-    input, label, textarea {
-      color: red;
-      border-style: solid;
-      border-color: red;
-    }
- }
- </style>
+  @import '@/scss/fc-forms.scss';
+</style>
