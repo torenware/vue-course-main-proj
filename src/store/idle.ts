@@ -97,7 +97,7 @@ const store: StoreOptions<IdleStore> = {
       function setUpTimer() {
         context.commit('setIdle', Date.now());
         const expireAt = context.getters.idleExpires;
-        console.log('Will idle out at', new Date(expireAt));
+        // console.log('Will idle out at', new Date(expireAt));
         const timer = setInterval(() => {
           checkExpires();
         }, 10 * 1000);

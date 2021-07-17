@@ -1,9 +1,9 @@
 <template>
-  <button v-if="!link" :class="btnClasses">
+  <button v-if="!link" :class="btnClasses" ref="button">
     <slot>
     </slot>
   </button>
-  <router-link v-else :to="to" :class="btnClasses">
+  <router-link v-else :to="to" :class="btnClasses" ref="button">
     <slot>
     </slot>
   </router-link>
@@ -13,7 +13,7 @@
 
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, ref, Ref, computed, onMounted } from 'vue';
 
 type StylingMode = "flat" | "outline" | null;
 
@@ -35,9 +35,15 @@ export default defineComponent({
       required: false,
       default: ''
     },
+    // If set, this button gets focus.
+    default: {
+      type: Boolean,
+      required: false
+    }
   },
   setup(props) {
 
+    const button: Ref<HTMLElement | null> = ref(null);
     const btnClasses = computed(() => {
       if (props.mode) {
         return {
@@ -48,11 +54,19 @@ export default defineComponent({
         return {};
       }
     });
- 
+
+    onMounted(() => {
+      if (props.default) {
+        console.log('default is set');
+        button.value?.focus();
+      }
+    });
+
     return {
-      btnClasses
+      btnClasses,
+      button
     };
-    
+
   },
 })
 </script>

@@ -7,7 +7,7 @@
       </p>
     </template>
     <template #actions>
-      <base-button mode="outline" @click="renewSession">Continue</base-button>
+      <base-button  @click="renewSession" :default="true">Continue</base-button>
       <base-button mode="outline" @click="$emit('close')">Cancel</base-button>
     </template>
   </base-dialog>
