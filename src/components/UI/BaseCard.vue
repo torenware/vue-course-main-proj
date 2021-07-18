@@ -39,6 +39,10 @@ export default defineComponent({
   padding: 1rem;
   margin: 2rem auto;
   max-width: 40rem;
+
+  @media only screen and (max-width: 40em) {
+    margin: 0 auto;
+  }
 }
 
 .card.info {

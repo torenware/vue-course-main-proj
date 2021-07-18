@@ -57,12 +57,14 @@
           />
           </template>
         </base-form-control>
-        <base-button @mousedown="mouseDown">
-          Submit Your Info
-        </base-button>
-        <base-button @click.prevent="clearRegForm" @mouseover="unselectFields" mode="outline">
-          Clear Form
-        </base-button>
+        <div class="buttons">
+          <base-button @mousedown="mouseDown">
+            Submit Your Info
+          </base-button>
+          <base-button @click.prevent="clearRegForm" @mouseover="unselectFields" mode="outline">
+            Clear Form
+          </base-button>
+        </div>
       </form>
     </base-card>
   </section>
@@ -226,4 +228,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/scss/fc-forms.scss';
+
+.buttons {
+  @media only screen and (max-width: 40em) {
+    button {
+      font-size: 12px;
+      padding: 12px;
+    }
+  }
+}
 </style>

@@ -22,7 +22,7 @@
             Become a Coach
           </router-link>
         </li>
-        <li>
+        <li class='auth'>
           <router-link to="/signin" v-if="!isLoggedIn">
             Log In
           </router-link>
@@ -98,6 +98,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
+
 }
 
 header button {
@@ -110,6 +111,7 @@ header a, header button, div.user-name {
   display: inline-block;
   padding: 0.75rem 1.5rem;
   border: 1px solid transparent;
+
 }
 
 a:active,
@@ -124,6 +126,12 @@ header button:hover
 h1 {
   margin: 20px;
   color: white;
+
+  @media only screen and (max-width: 40em) {
+    font-size: 16px;
+    margin: 5px;
+  }
+
 }
 
 h1 a {
@@ -142,6 +150,18 @@ header nav {
   margin: auto;
   display: flex;
   justify-content: space-between;
+
+  @media only screen and (max-width: 40em) {
+    font-size: 80%;
+  }
+
+
+.user-name {
+    @media only screen and (max-width: 40em) {
+      display: none;
+    }
+  }
+
 }
 
 header ul {
@@ -155,9 +175,23 @@ header ul {
 
 li {
   margin: 0 0.5rem;
+  text-align: center;
+
+  @media only screen and (max-width: 40em) {
+    margin: 0 0.2rem;
+  }
+
   &:last-of-type {
     margin-right: 2em;
+    @media only screen and (max-width: 40em) {
+      margin-right: 1em;
+    }
   }
+
+  &.auth {
+    display: flex;
+  }
+
 }
 
 .expiring-in {

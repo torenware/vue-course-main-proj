@@ -334,11 +334,13 @@ const store: StoreOptions<AuthStore> = {
         window.scroll(0, 0);
       }
     },
-    logout(context) {
+    logout(context, sendFlash = true) {
       context.commit('setUser', null);
       context.commit('setCurrentCoach', null);
       context.dispatch('cleanUpTimer');
-      context.dispatch('setFlash', 'Goodbye!');
+      if (sendFlash) {
+        context.dispatch('setFlash', 'Goodbye!');
+      }
       window.scroll(0, 0);
       clearLocalData();
       context.commit('setUser', null);

@@ -57,7 +57,6 @@ export default defineComponent({
 
     onMounted(() => {
       if (props.default) {
-        console.log('default is set');
         button.value?.focus();
       }
     });
@@ -78,6 +77,7 @@ a {
   text-decoration: none;
   padding: 0.75rem 1.5rem;
   font: inherit;
+  font-size: 16px;
   background-color: #3a0061;
   border: 1px solid #3a0061;
   color: white;
@@ -85,6 +85,13 @@ a {
   border-radius: 30px;
   margin-right: 0.5rem;
   display: inline-block;
+
+
+  @media only screen and (max-width: 40em) {
+    font-size: 12px;
+    padding: 0.5rem .8rem;
+  }
+
 }
 
 a:hover,

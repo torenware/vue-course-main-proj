@@ -74,6 +74,10 @@ export default defineComponent({
         // start the clock...
         store.dispatch('setUpTimer', notifier);
       }
+      else if (store.getters.jwtToken) {
+        // call logout w/o the flash message.
+        store.dispatch('logout', false);
+      }
       else {
         // if we landed first at a guarded route,
         // trigger the route guards.
@@ -153,7 +157,7 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
 * {
@@ -161,8 +165,22 @@ export default defineComponent({
 }
 
 html {
+  @import "@/scss/main.scss";
   font-family: "Roboto", sans-serif;
+  // font-size: 62.5%; //rem == 10px
+
+  @include respond(tab-land) {
+    // rem == 9px
+    // font-size: 56.25%;
+  }
+
+  @include respond(tab-port) {
+    // rem == 8px
+    // font-size: 50%;
+  }
+
 }
+
 
 body {
   margin: 0;
@@ -176,6 +194,13 @@ body {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+section {
+  @media only screen and (max-width: 40em) {
+    margin: 0;
+    padding: .5rem 0;
+  }
 }
 
 </style>

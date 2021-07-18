@@ -1,0 +1,69 @@
+@mixin clearfix {
+  &::after {
+    content: '';
+    clear: both;
+    display: table;
+  }
+}
+
+@mixin absCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/**
+Media query repeater mixin.
+
+$breakpoint:
+- phone
+- tab-port
+- tab-land
+- big-desk
+
+*/
+@mixin respond($breakpoint) {
+  // we use em units, since rem are not
+  // well supported (esp. Safari to v13).
+  // We use em instead, using a base of
+  // 16px === 1em.
+
+  // Order matters, since last CSS wins.
+  // max-width smallest last, min-width
+  // is smallest first.
+  @if $breakpoint == tab-land {
+    // 1200
+    @media only screen and (max-width: 75em) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == tab-port {
+    // 900
+    @media only screen and (max-width: 56.25em) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == phone-land {
+    // 450 x 900
+    @media only screen and (max-height: 31.26em) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == phone {
+    // 600
+    @media only screen and (max-width: 37.5em) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == big-desk {
+    // 1800
+    @media only screen and (min-width: 112.5em) {
+      @content;
+    }
+  }
+}
