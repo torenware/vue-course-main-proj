@@ -12,13 +12,16 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, provide, computed, watch, onMounted } from 'vue';
+import { defineComponent, defineAsyncComponent, ref, provide, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from '@/store';
 import TheHeader from './components/layout/TheHeader.vue';
-import RenewSession from './components/widgets/RenewSession.vue';
-import AboutToIdleOut from './components/widgets/AboutToIdleOutAlert.vue';
 import notifier from '@/store/countDowner';
+
+// Lazy loaded.
+const RenewSession =  defineAsyncComponent( async () => import('./components/widgets/RenewSession.vue'));
+const AboutToIdleOut = defineAsyncComponent( async () => import('./components/widgets/AboutToIdleOutAlert.vue'));
+
 
 export default defineComponent({
   components: {

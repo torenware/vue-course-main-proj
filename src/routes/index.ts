@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 import CoachList from '../components/pages/CoachList.vue';
-import CoachDetails from '../components/pages/CoachDetails.vue';
-import Register from '../components/pages/Register.vue';
-import Contact from '../components/pages/Contact.vue';
-import RequestList from '../components/pages/RequestList.vue';
 import AuthForm from '../components/pages/auth/UserAuth.vue';
 import NotFound from '../components/pages/NotFound.vue';
 import store from '@/store';
+
+// Lazy loading components.
+const CoachDetails = () => import('../components/pages/CoachDetails.vue');
+const Register = () => import('../components/pages/Register.vue');
+const Contact = () => import('../components/pages/Contact.vue');
+const RequestList = () => import('../components/pages/RequestList.vue');
 
 const routes: RouteRecordRaw[] = [
   {
