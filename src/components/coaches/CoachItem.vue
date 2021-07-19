@@ -120,6 +120,7 @@ div {
   display: flex;
   justify-content: space-between;
   margin-top: 1em;
+  padding: 0 1em;
 
   @media only screen and (max-width: 40em) {
     button, a {
