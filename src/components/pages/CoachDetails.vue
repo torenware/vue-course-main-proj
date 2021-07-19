@@ -97,10 +97,16 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   header {
     color: white;
     margin-bottom: 10px;
+  }
+
+  section {
+    @media only screen and (max-width: 40em) {
+      margin: 0;
+    }
   }
 
   .contact .btn {
@@ -110,5 +116,13 @@ export default defineComponent({
   .badges {
     display: flex;
     justify-content: center;
+
+    @media only screen and (max-width: 40em) {
+      .badge {
+        font-size: 12px;
+        padding: .7em 1em;
+      }
+    }
+
   }
 </style>

@@ -7,7 +7,7 @@
     <base-spinner />
   </div>
   <base-card v-else>
-    <section>
+    <section class="search-controls">
       <div class="controls">
         <div class='control-buttons'>
           <base-button @click="reloadCoaches" mode="outline">
@@ -24,7 +24,7 @@
         </div>
       </div>
     </section>
-    <section>
+    <section class="coach-list">
       <ul>
         <coach-item
           v-for="coach in coachList"
@@ -125,7 +125,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.controls {
   display: flex;
   flex-direction: column;

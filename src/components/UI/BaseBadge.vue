@@ -29,7 +29,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .badge {
   background-color: #ccc;
   color: #252525;
@@ -37,6 +37,10 @@ export default defineComponent({
   padding: 0.5rem 1.5rem;
   display: inline-block;
   margin-right: 0.5rem;
+
+  @media only screen and (max-width: 40em) {
+    margin-bottom: .7em;
+  }
 }
 
 .frontend {

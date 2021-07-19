@@ -81,7 +81,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /**
 .actions a, span {
   display: inline-block;
@@ -119,5 +119,12 @@ div {
 .actions {
   display: flex;
   justify-content: flex-end;
+
+  @media only screen and (max-width: 40em) {
+    button, a {
+      font-size: 12px;
+      padding: .5em 1em;
+    }
+  }
 }
 </style>

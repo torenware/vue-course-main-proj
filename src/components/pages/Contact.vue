@@ -27,7 +27,7 @@
 
     <base-form-control>
       <template #default>
-      <textarea rows="5" cols="40"
+      <textarea rows="5"
           placeholder="Your message here"
           required
           v-model.trim="message"></textarea>

@@ -10,5 +10,10 @@ section {
  // border: 1px solid #797979;
   padding: 1rem;
   flex: 1;
+
+  @media only screen and (max-width: 40em) {
+    margin: .5rem;
+    padding: .5rem;
+  }
 }
 </style>
