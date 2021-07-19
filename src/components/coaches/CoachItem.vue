@@ -118,7 +118,8 @@ div {
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  margin-top: 1em;
 
   @media only screen and (max-width: 40em) {
     button, a {
