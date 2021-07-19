@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, watch } from 'vue';
+import { defineComponent, ref, Ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import useFormHooks from '@/hooks/UseFormHooks';
@@ -86,7 +86,7 @@ export default defineComponent({
     const rate = ref(null); // ref to DOM.
     const description = ref('');
 
-    const areaCGroup = ref(null);
+    const areaCGroup: Ref<HTMLDivElement | null> = ref(null);
     const regForm: Ref<HTMLFormElement> | Ref<null> = ref(null);
 
     const store = useStore();
@@ -118,10 +118,22 @@ export default defineComponent({
     // Validate or invalidate the checkbox group
     // before submit actually occurs.
     function mouseDown() {
-      console.log('mouse down! mouse down!');
+      // console.log('mouse down! mouse down!');
       const areaOK = validateAreaGroup();
       markAreaGroupValidity(areaOK);
     }
+
+    // Put a blur listener on the last area checkbox and
+    // trigger a validity check on the checkbox group.
+    function validateOnCBBlur() {
+      const lastCB = areaCGroup.value?.querySelector('div.checkbox:last-of-type input');
+      if( lastCB) {
+        lastCB.addEventListener('blur', () => {
+          const isValid = validateAreaGroup();
+          markAreaGroupValidity(isValid);
+        });
+      }
+   }
 
     function validateAreaGroup() {
       if (!areaCGroup.value) {
@@ -201,6 +213,10 @@ export default defineComponent({
       }
       window.scroll(0,0);
     };
+
+    onMounted(() => {
+      validateOnCBBlur();
+    })
 
     return {
       allowedAreas,
